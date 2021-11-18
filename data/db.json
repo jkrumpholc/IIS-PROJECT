@@ -1,0 +1,19 @@
+{
+    "users":[
+    {
+      "age": 23,
+      "name": "Bird Ramsey",
+      "gender": "male",
+      "pwd": "abcdef",
+      "email": "birdramsey@nimon.com"
+    },
+    {
+        "age": 30,
+        "name": "Hey Balls",
+        "gender": "female",
+        "pwd": "123456",
+        "email": "heyballs@nimon.com"
+      }
+
+    ]
+}
