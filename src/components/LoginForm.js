@@ -1,29 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState , useEffect } from 'react';
 import './LoginForm.css';
 import axios from "axios";
 
 
 
-
-
-export default function LoginForm({Login, error}) {
+export default function LoginForm(props) {
     const [details, setDetails] = useState({username:"",email:"",password:""});
-    
-    const [user, setUser] = useState()
+   
   
-  const handleSubmit = async e => {
-    e.preventDefault();
-    let user = [ details.username,details.password] ;
-    const response = await axios.post(
-      "http://localhost:8000/users",
-      user
-    );
-    // set the state of the user
-    setUser(response.data)
-    // store the user in localStorage
-    localStorage.setItem('user', response.data)
-    console.log(response.data)
-  }
+    const handleSubmit = async e => {
+      e.preventDefault();
+      let user = [ details.username,details.password] ;
+      const response = await axios.get(
+        `http://localhost:8000/users?username=${details.username}`);
+      // set the state of the user
+      props.stateHandler(response.data);
+        console.log(response.data)
+        // store the user in localStorage
+        localStorage.setItem("user", response.data)
+      }
+
+      
+  
   return(
 
     

@@ -9,29 +9,21 @@ import { User } from './components/User';
 
 
 function App() {
-  const [user,setUser ]= useState({name:"",email:""})
-  const [error,setError ]= useState("")
   
- 
- 
+  const [user, setUser] = useState([])
+    
+  const stateHandler = (foo)=> {
+    setUser(foo);
+  }
+
   useEffect(() => {
     const loggedInUser = localStorage.getItem("user");
     if (loggedInUser) {
-      const foundUser = JSON.parse(loggedInUser);
+      const foundUser = loggedInUser;
       setUser(foundUser);
     }
   }, []);
-
-
-  const Login =details =>{
-      console.log(details);
-     
-     
-      
-      
-
-
-  }
+ 
 
 
   return (
@@ -40,11 +32,11 @@ function App() {
       <Header/>
 
       <Routes>
-        
-        <Route path="/login"  element={<LoginForm Login={Login} error={error}/> }/>
+
+        <Route path="/login"  element={<LoginForm  stateHandler={stateHandler} /> }/>
         <Route path="/miestnosti" element={<Miestnosti/>}/> 
         <Route path="/user" element={<User />}/> 
-          
+
       </Routes>
 
       
