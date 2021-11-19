@@ -2,6 +2,7 @@
     "users":[
     {
       "age": 23,
+      "username": "Boris",
       "name": "Bird Ramsey",
       "gender": "male",
       "pwd": "abcdef",
@@ -9,6 +10,7 @@
     },
     {
         "age": 30,
+        "username": "Alex",
         "name": "Hey Balls",
         "gender": "female",
         "pwd": "123456",

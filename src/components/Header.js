@@ -11,9 +11,11 @@ export const Header = () => {
           <div className="topnav-right">
 
             
-            <NavButton redirect="#" text="Home"/>
-            <NavButton redirect="#" text="Sign In"/>
-            <NavButton redirect="#" text="Miestnosti"/>
+            <NavButton redirect="/" text="Home"/>
+            <NavButton redirect="/login" text="Sign In"/>
+            <NavButton redirect="/miestnosti" text="Miestnosti"/>
+            <NavButton redirect="/user" text="Profile"/>
+
           </div>
         </div>
         </header>

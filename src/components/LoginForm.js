@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './LoginForm.css';
-
+import axios from "axios";
 
 
 
@@ -8,13 +8,21 @@ import './LoginForm.css';
 
 export default function LoginForm({Login, error}) {
     const [details, setDetails] = useState({username:"",email:"",password:""});
-
+    
+    const [user, setUser] = useState()
   
   const handleSubmit = async e => {
     e.preventDefault();
-    Login(details);
-
-    
+    let user = [ details.username,details.password] ;
+    const response = await axios.post(
+      "http://localhost:8000/users",
+      user
+    );
+    // set the state of the user
+    setUser(response.data)
+    // store the user in localStorage
+    localStorage.setItem('user', response.data)
+    console.log(response.data)
   }
   return(
 
