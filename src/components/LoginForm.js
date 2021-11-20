@@ -1,4 +1,4 @@
-import React, { useState , useEffect } from 'react';
+import React, { useState } from 'react';
 import './LoginForm.css';
 import axios from "axios";
 
@@ -6,18 +6,22 @@ import axios from "axios";
 
 export default function LoginForm(props) {
     const [details, setDetails] = useState({username:"",email:"",password:""});
-   
+    const [LogState, setLogState] = useState(false)
   
     const handleSubmit = async e => {
       e.preventDefault();
-      let user = [ details.username,details.password] ;
+      //let user = [ details.username,details.password] ;
       const response = await axios.get(
         `http://localhost:8000/users?username=${details.username}`);
       // set the state of the user
       props.stateHandler(response.data);
-        console.log(response.data)
+        console.log(response.data);
+        console.log(Object.keys(response.data));
         // store the user in localStorage
-        localStorage.setItem("user", response.data)
+        if(Object.keys(response.data).length !== 0){
+          sessionStorage.setItem("logged_user", response.data[0].username);
+          setLogState(true);
+        }
       }
 
       
@@ -26,6 +30,7 @@ export default function LoginForm(props) {
 
     
     <div className="login-wrapper">
+        {LogState &&
         <form onSubmit={handleSubmit}>
             <label>
                 <p>Username</p>
@@ -38,7 +43,8 @@ export default function LoginForm(props) {
             <div>
             <button  type="submit" value="LOGIN">Submit</button>
             </div>
-        </form>
+        </form>}
+        {!LogState && <div>Already logged in</div>}
     </div>
   )
 }

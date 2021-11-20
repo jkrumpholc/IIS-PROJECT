@@ -17,7 +17,8 @@ function App() {
   }
 
   useEffect(() => {
-    const loggedInUser = localStorage.getItem("user");
+    const loggedInUser = sessionStorage.getItem("logged_user");
+    console.log(loggedInUser);
     if (loggedInUser) {
       const foundUser = loggedInUser;
       setUser(foundUser);
@@ -35,7 +36,7 @@ function App() {
 
         <Route path="/login"  element={<LoginForm  stateHandler={stateHandler} /> }/>
         <Route path="/miestnosti" element={<Miestnosti/>}/> 
-        <Route path="/user" element={<User />}/> 
+        <Route path="/user" element={<User user ={user}/>}/> 
 
       </Routes>
 

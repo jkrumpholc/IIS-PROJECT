@@ -1,12 +1,12 @@
 
 import './Header.css';
-import { Button } from './Button';
+//import { Button } from './Button';
 import NavButton from './NavButton';
 
 export const Header = () => {
     return (
         <header className="App-header">
-        <div class="topnav">
+        <div className="topnav">
           <h2>Konference</h2>
           <div className="topnav-right">
 
