@@ -2,10 +2,12 @@
 import './Miestnosti.css';
 import React, { useState } from 'react';
 import {CreateConference} from './CreateConference';
+import {RegisterPresentation} from './RegisterPresentation';
 
-export const Miestnosti = () => {
+export const Miestnosti = (props) => {
     
-    const [isToggled, setIsToggled] = useState(false);
+    const [isToggledAdd, setIsToggledAdd] = useState(false);
+    const [isToggledReg, setIsToggledReg] = useState(false);
 
     const numbers = [1, 2, 3, 4, 5];
     const listItems = numbers.map((number) =>
@@ -23,17 +25,14 @@ export const Miestnosti = () => {
         <div className = "confWrapper">
         <div id="myDIV" className="header">
             <h2>Konference</h2>
-        <label for="myInput" style={{float:"left"}}>Search</label>
-        
+        <label for="myInput" style={{float:"left"}}>Search</label>  
         <input type="text" id="myInput" placeholder="Conference title..."/>
-        
-        <span onClick={()=> setIsToggled(!isToggled )} className="addBtn">Add</span>
-            
+        {Object.keys(props.user).length!==0&& <span onClick={() =>{ setIsToggledAdd(!isToggledAdd ); setIsToggledReg(false );}} className="addBtn">Add</span>}
+        {Object.keys(props.user).length!==0&& <span onClick={()=> { setIsToggledAdd(false);setIsToggledReg(!isToggledReg  );}} className="addBtn">Registrovať príspevok</span>}
         </div>
-        {isToggled&& <CreateConference/>}
-
+        {isToggledAdd&& <CreateConference/>}
+        {isToggledReg&& <RegisterPresentation/>}
             <ul id="myUL">{listItems}</ul>
         </div>
-
     )
 }

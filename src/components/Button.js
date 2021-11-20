@@ -1,8 +1,11 @@
 import PropTypes from 'prop-types'
 
-export const Button = ({text}) => {
+export const Button = ({onClick,text}) => {
+
+    
+
     return (
-        <button className="button">
+        <button  className="topnav">
             {text}
         </button>
     )

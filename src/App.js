@@ -30,12 +30,12 @@ function App() {
   return (
     <Router>
       <div className="Container">
-      <Header/>
+      <Header user={user}/>
 
       <Routes>
 
         <Route path="/login"  element={<LoginForm  stateHandler={stateHandler} user={user} /> }/>
-        <Route path="/miestnosti" element={<Miestnosti/>}/> 
+        <Route path="/konference" element={<Miestnosti  user={user} />}/> 
         <Route path="/user" element={<User user ={user}/>}/> 
 
       </Routes>

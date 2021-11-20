@@ -1,9 +1,11 @@
 
 import PropTypes from 'prop-types'
 
-export const NavButton = ({text,redirect}) => {
+export const NavButton = ({onClick,text,redirect}) => {
+    
+    
     return (
-        <a href={redirect} className="topnav">
+        <a href={redirect} onClick={onClick} className="topnav">
             {text}
         </a>
     )

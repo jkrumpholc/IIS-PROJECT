@@ -3,7 +3,7 @@ import React,{useState} from "react"
 
 
 
-export const CreateConference = () => {
+export const RegisterPresentation = () => {
     const[roomState,setRoomState]=  useState("");
     
     return (
@@ -24,34 +24,15 @@ export const CreateConference = () => {
             </label>
            
 
-            <label className="formLabels" > Time From
+            <label className="formLabels" > Time
             <br/>
                 <input type="time" id="appt" name="appt" min="09:00" max="20:00" required/>
 
             </label>
-
-            <label className="formLabels" > Time To
-            <br/>
-                <input type="time" id="appt" name="appt" min="10:00" max="21:00" required/>
-
-            </label>
-
             <label   className="formLabels" > Available rooms
-            <select onChange={(e)=>{
-                const selectedRoom=e.target.value;
-                setRoomState(selectedRoom);
-            }}>
-                <option value="A">Apple</option>
-                <option value="B">Banana</option>
-                <option value="C">Cranberry</option>
-            </select> 
-            {roomState}
+            
             </label>
             <input type="submit" value="Submit" />
-           
-
-           
-           
         </form>
             
         </div>
