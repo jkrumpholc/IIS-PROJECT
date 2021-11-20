@@ -6,7 +6,6 @@ import axios from "axios";
 
 export default function LoginForm(props) {
     const [details, setDetails] = useState({username:"",email:"",password:""});
-    const [LogState, setLogState] = useState(false)
   
     const handleSubmit = async e => {
       e.preventDefault();
@@ -20,7 +19,6 @@ export default function LoginForm(props) {
         // store the user in localStorage
         if(Object.keys(response.data).length !== 0){
           sessionStorage.setItem("logged_user", response.data[0].username);
-          setLogState(true);
         }
       }
 
@@ -30,7 +28,7 @@ export default function LoginForm(props) {
 
     
     <div className="login-wrapper">
-        {LogState &&
+        {Object.keys(props.user).length === 0 &&
         <form onSubmit={handleSubmit}>
             <label>
                 <p>Username</p>
@@ -44,7 +42,7 @@ export default function LoginForm(props) {
             <button  type="submit" value="LOGIN">Submit</button>
             </div>
         </form>}
-        {!LogState && <div>Already logged in</div>}
+        {Object.keys(props.user).length !== 0 && <div>Already logged in</div>}
     </div>
   )
 }

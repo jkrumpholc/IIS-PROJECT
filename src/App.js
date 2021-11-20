@@ -34,7 +34,7 @@ function App() {
 
       <Routes>
 
-        <Route path="/login"  element={<LoginForm  stateHandler={stateHandler} /> }/>
+        <Route path="/login"  element={<LoginForm  stateHandler={stateHandler} user={user} /> }/>
         <Route path="/miestnosti" element={<Miestnosti/>}/> 
         <Route path="/user" element={<User user ={user}/>}/> 
 
