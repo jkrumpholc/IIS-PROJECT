@@ -1,14 +1,14 @@
 {
     "users":[
-    {
+      {
       "age": 23,
       "username": "Boris",
       "name": "Bird Ramsey",
       "gender": "male",
       "pwd": "abcdef",
       "email": "birdramsey@nimon.com"
-    },
-    {
+      },
+      {
         "age": 30,
         "username": "Alex",
         "name": "Hey Balls",
@@ -16,6 +16,27 @@
         "pwd": "123456",
         "email": "heyballs@nimon.com"
       }
-
-    ]
+    ],
+    "konferencie":[
+      {
+        "id": 5608,
+        "description": "Sací konference",
+        "genre": "Sání/felace",
+        "place": "Božetěchova 2",
+        "time_from": "12:00",
+        "time_to": "16:30",
+        "max_capacity": "250",
+        "booked_tickets": "65"
+      },
+      {
+        "id": 5609,
+        "description": "Mrdací konference",
+        "genre": "Mrdání",
+        "place": "Božetěchova 2",
+        "time_from": "10:00",
+        "time_to": "12:00",
+        "max_capacity": "500",
+        "booked_tickets": "65"
+      }
+    ]  
 }
