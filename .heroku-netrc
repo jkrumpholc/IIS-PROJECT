@@ -1,0 +1,6 @@
+machine api.heroku.com
+  login mundikmundik@gmail.com
+  password ddfbf7f1-10f4-48e6-92d4-58943b0d1285
+machine git.heroku.com
+  login mundikmundik@gmail.com
+  password ddfbf7f1-10f4-48e6-92d4-58943b0d1285
