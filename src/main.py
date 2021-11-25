@@ -1,4 +1,6 @@
 import psycopg2
+from werkzeug import exceptions
+from flask import Flask, request
 
 
 class Database:
@@ -11,11 +13,40 @@ class Database:
             sslmode='require')
         self.cur = self.conn.cursor()
 
-    def send_request(self, request):
-        sql = f'''{request}'''
+    def send_request(self, sql):
         try:
             self.cur.execute(sql)
             return True
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
             return False
+
+
+
+app = Flask(__name__)
+
+
+@app.route('/users', methods=['GET'])
+def show_user():
+    user_id = request.args.get('username', None)
+    passwd = request.args.get('password', None)
+    print("Reacted - user")
+    print(f'Username: {user_id}')
+    print(f'Password: {passwd}')
+    return "Hello"
+
+
+@app.errorhandler(exceptions.InternalServerError)
+def handle_bad_request(e):
+    print(e)
+    return 'bad request! 500', 500
+
+
+@app.errorhandler(exceptions.NotFound)
+def handle_bad_request(e):
+    print(e)
+    return 'bad request! 404', 404
+
+
+if __name__ == '__main__':
+    app.run(debug=True, port=8000, host='localhost')
