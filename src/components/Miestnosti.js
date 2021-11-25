@@ -3,6 +3,7 @@ import './Miestnosti.css';
 import React, { useState, useEffect } from 'react';
 import {CreateConference} from './CreateConference';
 import {RegisterPresentation} from './RegisterPresentation';
+import { Link } from 'react-router-dom';
 
 export const Miestnosti = (props) => {
     
@@ -24,8 +25,10 @@ export const Miestnosti = (props) => {
         return response.data;
     }
     //const numbers = [1, 2, 3, 4, 5];
+    //<li onClick={() => {}}>id: {item.id} | popis: {item.description} | žánr: {item.genre} | od: {item.time_from} | do: {item.time_to} | prodané vstupenky: {item.booked_tickets}/{item.max_capacity}</li>
+    //);
     const listItems = Object.values(Konf).map((item) =>
-    <li>id: {item.id} | popis: {item.description} | žánr: {item.genre} | od: {item.time_from} | do: {item.time_to} | prodané vstupenky: {item.booked_tickets}/{item.max_capacity}</li>
+    <Link to="/clicked_konf"><li onClick={() => {props.konfStateHandler(item)}}>id: {item.id} | popis: {item.description} | žánr: {item.genre} | od: {item.time_from} | do: {item.time_to} | prodané vstupenky: {item.booked_tickets}/{item.max_capacity}</li></Link>
     );
     
     return (

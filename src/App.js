@@ -6,14 +6,19 @@ import { BrowserRouter as Router, Routes ,Route } from 'react-router-dom';
 import LoginForm from './components/LoginForm';
 import { Miestnosti } from './components/Miestnosti';
 import { User } from './components/User';
+import { Clicked_konf } from './components/Clicked_konf';
 
 
 function App() {
   
   const [user, setUser] = useState([])
+  const [selected_konf, setSelected_konf] = useState([])
     
   const stateHandler = (foo)=> {
     setUser(foo);
+  }
+  const konfStateHandler = (foo) => {
+    setSelected_konf(foo);
   }
 
   useEffect(() => {
@@ -35,8 +40,9 @@ function App() {
       <Routes>
 
         <Route path="/login"  element={<LoginForm  stateHandler={stateHandler} user={user} /> }/>
-        <Route path="/konference" element={<Miestnosti  user={user} />}/> 
+        <Route path="/konference" element={<Miestnosti  user={user} konfStateHandler={konfStateHandler} />}/> 
         <Route path="/user" element={<User user ={user}/>}/> 
+        <Route path="/clicked_konf" element={<Clicked_konf selected_konf={selected_konf}/>}/> 
 
       </Routes>
 
