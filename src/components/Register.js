@@ -1,4 +1,4 @@
-
+import axios from "axios";
 import React, { useState } from 'react';
 export const Register = () => {
     const [regdetails, setregDetails] = useState({username:"",password:"",name:"",surname:"",gender:"male"});
