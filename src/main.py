@@ -1,6 +1,8 @@
 import psycopg2
 from werkzeug import exceptions
 from flask import Flask, request
+import hashlib
+import json
 
 
 class Database:
@@ -14,26 +16,44 @@ class Database:
         self.cur = self.conn.cursor()
 
     def send_request(self, sql):
+        ret = None
         try:
             self.cur.execute(sql)
-            return True
+            try:
+                ret = self.cur.fetchall()
+            except psycopg2.ProgrammingError:
+                ret = ""
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
-            return False
+            ret = ""
+        except psycopg2.ProgrammingError:
+            ret = f"Wrong SQL request: {sql}"
+        except psycopg2.OperationalError:
+            ret = "Cannot connect to database."
+        finally:
+            return ret
 
 
 
 app = Flask(__name__)
+data = Database()
 
 
-@app.route('/users', methods=['GET'])
+@app.route('/login', methods=['GET', 'POST'])
 def show_user():
     user_id = request.args.get('username', None)
     passwd = request.args.get('password', None)
-    print("Reacted - user")
-    print(f'Username: {user_id}')
-    print(f'Password: {passwd}')
-    return "Hello"
+    data_pass = data.send_request(f"""SELECT password from public."User" where username = '{user_id}'""")
+    if len(data_pass) > 0:
+        data_pass = data_pass[0][0]
+        passwd_hash = (hashlib.md5(passwd.encode())).hexdigest()
+        if data_pass == passwd_hash:
+            ret = {"result": "Success"}
+        else:
+            ret = {"result": "Failure"}
+    else:
+        ret = {"result": "Failure"}
+    return json.dumps(ret)
 
 
 @app.errorhandler(exceptions.InternalServerError)
