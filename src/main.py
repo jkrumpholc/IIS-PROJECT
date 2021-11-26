@@ -16,22 +16,27 @@ class Database:
             sslmode='require')
         self.cur = self.conn.cursor()
 
-    def send_request(self, sql):
+    def send_request(self, sql, read=True):
         ret = None
         try:
             self.cur.execute(sql)
-            try:
-                ret = self.cur.fetchall()
-            except psycopg2.ProgrammingError:
-                ret = ""
         except (Exception, psycopg2.DatabaseError) as error:
-            print(error)
-            ret = ""
+            ret = error
         except psycopg2.ProgrammingError:
             ret = f"Wrong SQL request: {sql}"
         except psycopg2.OperationalError:
             ret = "Cannot connect to database."
+        else:
+            if read:
+                try:
+                    ret = (True, self.cur.fetchall()[0])
+                except psycopg2.ProgrammingError:
+                    ret = False
+            else:
+                ret = True
         finally:
+            if not read:
+                self.conn.commit()
             return ret
 
 
@@ -46,19 +51,22 @@ data = Database()
 @cross_origin()
 def show_user():
     if request.method == 'GET':
-        user_id = request.args.get('username', None)
-        passwd = request.args.get('password', None)
+        username = request.args.get('username', None)
+        password = request.args.get('password', None)
     elif request.method == 'POST':
-        user_id = request.form['username']
-        passwd = request.form['password']
+        username = request.json['username']
+        password = request.json['password']
     else:
-        user_id = None
-        passwd = None
-    database_data = data.send_request(f"""SELECT password, id from public."User" where username = '{user_id}'""")
-    if len(database_data) > 0:
-        data_pass = database_data[0][0]
-        data_id = database_data[0][1]
-        passwd_hash = (hashlib.md5(passwd.encode())).hexdigest()
+        username = None
+        password = None
+    if None in (username, password):
+        ret = {"result": "Failure"}
+        return json.dumps(ret)
+    database_data = data.send_request(f"""SELECT password, id from public."User" where username = '{username}'""", True)
+    if database_data[0]:
+        data_pass = database_data[1][0]
+        data_id = database_data[1][1]
+        passwd_hash = (hashlib.md5(password.encode())).hexdigest()
         if data_pass == passwd_hash:
             ret = {"result": "Success", "id": data_id}
         else:
@@ -66,6 +74,38 @@ def show_user():
     else:
         ret = {"result": "Failure"}
     return json.dumps(ret)
+
+
+@app.route('/addUser', methods=['GET', 'POST'])
+@cross_origin()
+def register():
+    if request.method == 'GET':
+        username = request.args.get('username', None)
+        password = request.args.get('password', None)
+        name = request.args.get('name', None)
+        surname = request.args.get('surname', None)
+        gender = request.args.get('gender', None)
+    elif request.method == 'POST':
+        username = request.json['username']
+        password = request.json['password']
+        name = request.json['name']
+        surname = request.json['surname']
+        gender = request.json['gender']
+    else:
+        username = None
+        password = None
+        name = None
+        surname = None
+        gender = None
+    if None in (username, password, name, surname, gender):
+        ret = {"result": "Failure"}
+        return json.dumps(ret)
+    user_id = (data.send_request('''SELECT MAX(id) FROM public."User"''', True)[1][0])+1
+    passwd_hash = (hashlib.md5(password.encode())).hexdigest()
+    if data.send_request(f'''INSERT INTO public."User"(id, username, name, surname, gender, password)  VALUES
+                     ('{user_id}', '{username}', '{name}', '{surname}', '{gender}', '{passwd_hash}' )''', False):
+        ret = {"result": "Success", "id": user_id}
+        return ret
 
 
 @app.errorhandler(exceptions.InternalServerError)
