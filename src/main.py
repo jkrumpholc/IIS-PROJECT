@@ -41,14 +41,22 @@ data = Database()
 
 @app.route('/login', methods=['GET', 'POST'])
 def show_user():
-    user_id = request.args.get('username', None)
-    passwd = request.args.get('password', None)
-    data_pass = data.send_request(f"""SELECT password from public."User" where username = '{user_id}'""")
+    if request.method == 'GET':
+        user_id = request.args.get('username', None)
+        passwd = request.args.get('password', None)
+    elif request.method == 'POST':
+        user_id = request.form['username']
+        passwd = request.form['password']
+    else:
+        user_id = None
+        passwd = None
+    data_pass = data.send_request(f"""SELECT password, id from public."User" where username = '{user_id}'""")
     if len(data_pass) > 0:
         data_pass = data_pass[0][0]
+        data_id = data_pass[0][1]
         passwd_hash = (hashlib.md5(passwd.encode())).hexdigest()
         if data_pass == passwd_hash:
-            ret = {"result": "Success"}
+            ret = {"result": "Success", "id": data_id}
         else:
             ret = {"result": "Failure"}
     else:

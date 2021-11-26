@@ -1,2 +1,2 @@
-worker: python3 main.py
+worker: python3 src/main.py
 web: npm start
