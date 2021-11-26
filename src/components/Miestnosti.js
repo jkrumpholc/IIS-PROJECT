@@ -37,8 +37,8 @@ export const Miestnosti = (props) => {
             <h2>Konference</h2>
         <label for="myInput" style={{float:"left"}}>Search</label>  
         <input type="text" id="myInput" placeholder="Conference title..."/>
-        {Object.keys(props.user).length!==0&& <span onClick={() =>{ setIsToggledAdd(!isToggledAdd ); setIsToggledReg(false );}} className="addBtn">Add</span>}
-        {Object.keys(props.user).length!==0&& <span onClick={()=> { setIsToggledAdd(false);setIsToggledReg(!isToggledReg  );}} className="addBtn">Registrovať príspevok</span>}
+        {props.user["result"]==="Success"&& <span onClick={() =>{ setIsToggledAdd(!isToggledAdd ); setIsToggledReg(false );}} className="addBtn">Add</span>}
+        {props.user["result"]==="Success"&& <span onClick={()=> { setIsToggledAdd(false);setIsToggledReg(!isToggledReg  );}} className="addBtn">Registrovať príspevok</span>}
         </div>
         {isToggledAdd&& <CreateConference/>}
         {isToggledReg&& <RegisterPresentation/>}

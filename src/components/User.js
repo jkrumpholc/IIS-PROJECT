@@ -1,26 +1,29 @@
 import React from 'react'
 
-export const User = ({user}) => {
+export const User = (props) => {
 
     const numbers = [1, 2, 3, 4, 5];
-    const listItems = numbers.map((number) =>
-    <li>{number}</li>
-    );
+    const listItems = numbers.map((number,index) =>
 
+    <li key={index} >{
+        number 
+        }</li>
+    );
+    
     return (
         <div>
-            {Object.keys(user).length !== 0 &&
-                <p>logged in: {user}</p>
+            {props.user["result"]==="Success"&&
+                <p>logged in: {props.user["id"] }</p>
             }
-            {Object.keys(user).length !== 0 && <div>
+            {props.user["result"]==="Success"&& <div>
                 <p>Moje konferencie</p>
                 <ul>{listItems}</ul></div>
             }
-            {Object.keys(user).length !== 0 && <div>
+            {props.user["result"]==="Success"&& <div>
                 <p>Moje prezentacie</p>
                 <ul>{listItems}</ul></div>
             }
-            {Object.keys(user).length !== 0 && <div>
+            {props.user["result"]==="Success" && <div>
                 <p>Moje vstupekny</p>
                 <ul>{listItems}</ul></div>
             }

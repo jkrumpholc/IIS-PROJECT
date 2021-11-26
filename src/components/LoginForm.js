@@ -17,13 +17,13 @@ export default function LoginForm(props) {
         `http://localhost:8000/login?username=${details.username}&password=${details.password}`);
       // set the state of the user
       props.stateHandler(response.data);
-
-        console.log(response.data["id"]);
+      
         
-        console.log(Object.keys(response.data));
-        // store the user in localStorage
-        if(Object.keys(response.data).length !== 0){
-          sessionStorage.setItem("logged_user", response.data["id"]);
+        
+        console.log(response.data);
+        if(response.data['result']=="Success"){
+          
+          sessionStorage.setItem("logged_user", JSON.stringify(response.data));
         }
       }
 
@@ -36,7 +36,7 @@ export default function LoginForm(props) {
 
     
     <div className="login-wrapper">
-        {Object.keys(props.user).length === 0 &&
+        {props.user["result"]!=="Success" &&
         <form onSubmit={handleSubmit}>
             <label>
                 <p>Username</p>
@@ -50,7 +50,7 @@ export default function LoginForm(props) {
             <button  type="submit" value="LOGIN">Submit</button>
             </div>
         </form>}
-        {Object.keys(props.user).length === 0 &&
+        {props.user["result"]!=="Success" &&
         <form onSubmit={handleregSubmit}>
           <header style={{fontsize:30}}>Register</header>
             <label>
@@ -79,7 +79,7 @@ export default function LoginForm(props) {
             </div>
         </form>}
 
-        {Object.keys(props.user).length !== 0 && <div>Already logged in</div>}
+        {props.user["result"]==="Success" && <div>Already logged in</div>}
     </div>
 
 

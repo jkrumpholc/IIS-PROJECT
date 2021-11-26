@@ -22,9 +22,11 @@ function App() {
   }
 
   useEffect(() => {
-    const loggedInUser = sessionStorage.getItem("logged_user");
-    console.log(loggedInUser);
+    const loggedInUser = JSON.parse(sessionStorage.getItem("logged_user"))
+    
+    
     if (loggedInUser) {
+      
       const foundUser = loggedInUser;
       setUser(foundUser);
     }

@@ -8,21 +8,25 @@ import NavButton from './NavButton';
 export const Header = (props) => {
 
   const logoutUser = () =>{
+    
     sessionStorage.clear();
     console.log("sdasdad");
   }
-
-
+  const debug=()=>{
+    console.log(props.user["result"]);
+  }
+ 
+  
   return (
-        <header className="App-header">
+        <header className="App-header" onClick={debug}>
         <div className="topnav">
           <h2>Konference</h2>
           <div className="topnav-right">
 
             
             <NavButton redirect="/" text="Home"/>
-            {Object.keys(props.user).length===0 && <NavButton redirect="/login" text="Sign In"/>}
-            {Object.keys(props.user).length!==0 && <NavButton  onClick={logoutUser} redirect="/login" text="Logout"/>}
+            {props.user["result"]!=="Success" && <NavButton redirect="/login" text="Sign In"/>}
+            {props.user["result"]==="Success" && <NavButton  onClick={logoutUser} redirect="/login" text="Logout"/>}
             <NavButton redirect="/konference" text="Konference"/>
             <NavButton redirect="/user" text="Profile"/>
             
