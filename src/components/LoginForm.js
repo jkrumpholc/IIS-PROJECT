@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import './LoginForm.css';
 import axios from "axios";
+
+import { Register } from './Register';
 axios.defaults.baseURL = 'http://localhost:3000/';
 axios.defaults.headers.post['Content-Type'] ='application/json;charset=utf-8';
 axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
@@ -9,6 +11,7 @@ axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
 export default function LoginForm(props) {
     const [details, setDetails] = useState({username:"",email:"",password:""});
     const [regdetails, setregDetails] = useState({username:"",password:"",name:"",surname:"",gender:"male"});
+    const [isToggledReg, setIsToggledReg] = useState(false);
     const handleSubmit = async e => {
       
       e.preventDefault();
@@ -27,10 +30,7 @@ export default function LoginForm(props) {
         }
       }
 
-      const handleregSubmit = async ee => {
-        ee.preventDefault();
-        console.log(regdetails)
-        }
+      
 
   return(
 
@@ -50,34 +50,8 @@ export default function LoginForm(props) {
             <button  type="submit" value="LOGIN">Submit</button>
             </div>
         </form>}
-        {props.user["result"]!=="Success" &&
-        <form onSubmit={handleregSubmit}>
-          <header style={{fontsize:30}}>Register</header>
-            <label>
-                <p>Username</p>
-                <input type="text" onChange={e => setregDetails({...regdetails ,username: e.target.value})} value={regdetails.username} />
-            </label>
-            <label>
-                <p>Password</p>
-                <input type="password" onChange={e => setregDetails({...regdetails ,password: e.target.value})} value={regdetails.password} />
-            </label>
-            <label>
-                <p>Name</p>
-                <input type="text" onChange={e => setregDetails({...regdetails ,name: e.target.value})} value={regdetails.name} />
-            </label>
-            <label>
-                <p>Surname</p>
-                <input type="text" onChange={e => setregDetails({...regdetails ,surname: e.target.value})} value={regdetails.surname} />
-            </label>
-              <p>Gender</p>
-              <input type="radio" id="genderm" name="genderm" value="male" checked={regdetails.gender === "male"} onChange={e => setregDetails({...regdetails ,gender: e.target.value})}/>
-              <label htmlFor="genderm">Male</label><br></br>
-              <input type="radio" id="genderf" name="genderf" value="female" checked={regdetails.gender === "female"} onChange={e => setregDetails({...regdetails ,gender: e.target.value})}/>
-              <label htmlFor="genderf">Female</label><br></br>
-            <div>
-            <button  type="submit" value="Register">Register</button>
-            </div>
-        </form>}
+        {props.user["result"]!=="Success"&&  <button  onClick={() =>{ setIsToggledReg(!isToggledReg );}} >Sign Up</button>}
+        {props.user["result"]!=="Success"&& isToggledReg  && <Register/>}
 
         {props.user["result"]==="Success" && <div>Already logged in</div>}
     </div>
