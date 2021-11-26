@@ -1,24 +1,29 @@
 import React, { useState } from 'react';
 import './LoginForm.css';
 import axios from "axios";
-
+axios.defaults.baseURL = 'http://localhost:3000/';
+axios.defaults.headers.post['Content-Type'] ='application/json;charset=utf-8';
+axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
 
 
 export default function LoginForm(props) {
     const [details, setDetails] = useState({username:"",email:"",password:""});
     const [regdetails, setregDetails] = useState({username:"",password:"",name:"",surname:"",gender:"male"});
     const handleSubmit = async e => {
+      
       e.preventDefault();
       //let user = [ details.username,details.password] ;
       const response = await axios.get(
-        `https://iis-project-2021.herokuapp.com/login?username=${details.username}&password=${details.password}`);
+        `http://localhost:8000/login?username=${details.username}&password=${details.password}`);
       // set the state of the user
       props.stateHandler(response.data);
-        console.log(response.data);
+
+        console.log(response.data["id"]);
+        
         console.log(Object.keys(response.data));
         // store the user in localStorage
         if(Object.keys(response.data).length !== 0){
-          sessionStorage.setItem("logged_user", response.data[0].username);
+          sessionStorage.setItem("logged_user", response.data["id"]);
         }
       }
 
