@@ -50,10 +50,10 @@ def show_user():
     else:
         user_id = None
         passwd = None
-    data_pass = data.send_request(f"""SELECT password, id from public."User" where username = '{user_id}'""")
-    if len(data_pass) > 0:
-        data_pass = data_pass[0][0]
-        data_id = data_pass[0][1]
+    database_data = data.send_request(f"""SELECT password, id from public."User" where username = '{user_id}'""")
+    if len(database_data) > 0:
+        data_pass = database_data[0][0]
+        data_id = database_data[0][1]
         passwd_hash = (hashlib.md5(passwd.encode())).hexdigest()
         if data_pass == passwd_hash:
             ret = {"result": "Success", "id": data_id}
@@ -77,4 +77,4 @@ def handle_bad_request(e):
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=8000, host='localhost')
+    app.run(debug=True, port=8000)

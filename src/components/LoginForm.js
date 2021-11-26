@@ -11,7 +11,7 @@ export default function LoginForm(props) {
       e.preventDefault();
       //let user = [ details.username,details.password] ;
       const response = await axios.get(
-        `http://localhost:8000/login?username=${details.username}&password=${details.password}`);
+        `http://127.0.0.1:8000/login?username=${details.username}&password=${details.password}`);
       // set the state of the user
       props.stateHandler(response.data);
         console.log(response.data);
