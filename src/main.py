@@ -1,6 +1,7 @@
 import psycopg2
 from werkzeug import exceptions
 from flask import Flask, request
+from flask_cors import CORS, cross_origin
 import hashlib
 import json
 
@@ -36,10 +37,13 @@ class Database:
 
 
 app = Flask(__name__)
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 data = Database()
 
 
 @app.route('/login', methods=['GET', 'POST'])
+@cross_origin()
 def show_user():
     if request.method == 'GET':
         user_id = request.args.get('username', None)
