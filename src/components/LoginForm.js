@@ -13,22 +13,22 @@ export default function LoginForm(props) {
     const [regdetails, setregDetails] = useState({username:"",password:"",name:"",surname:"",gender:"male"});
     const [isToggledReg, setIsToggledReg] = useState(false);
     const handleSubmit = async e => {
-      
+
       e.preventDefault();
       //let user = [ details.username,details.password] ;
-      const response = await axios.get(
-        `http://localhost:8000/login?username=${details.username}&password=${details.password}`);
+      const response = await axios.post('http://localhost:8000/login', {
+        username: details.username,
+        password: details.password,
+
+      });
       // set the state of the user
       props.stateHandler(response.data);
-      
-        
-        
-        console.log(response.data);
+      console.log(response.data);
         if(response.data['result']=="Success"){
-          
+
           sessionStorage.setItem("logged_user", JSON.stringify(response.data));
         }
-      }
+    }
 
       
 
