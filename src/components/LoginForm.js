@@ -11,7 +11,7 @@ export default function LoginForm(props) {
       e.preventDefault();
       //let user = [ details.username,details.password] ;
       const response = await axios.get(
-        `http://localhost:8000/login?username=${details.username}&password=${details.password}`);
+        `https://iis-project-2021.herokuapp.com/login?username=${details.username}&password=${details.password}`);
       // set the state of the user
       props.stateHandler(response.data);
         console.log(response.data);
@@ -66,9 +66,9 @@ export default function LoginForm(props) {
             </label>
               <p>Gender</p>
               <input type="radio" id="genderm" name="genderm" value="male" checked={regdetails.gender === "male"} onChange={e => setregDetails({...regdetails ,gender: e.target.value})}/>
-              <label for="genderm">Male</label><br></br>
+              <label htmlFor="genderm">Male</label><br></br>
               <input type="radio" id="genderf" name="genderf" value="female" checked={regdetails.gender === "female"} onChange={e => setregDetails({...regdetails ,gender: e.target.value})}/>
-              <label for="genderf">Female</label><br></br>
+              <label htmlFor="genderf">Female</label><br></br>
             <div>
             <button  type="submit" value="Register">Register</button>
             </div>
