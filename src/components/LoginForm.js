@@ -10,17 +10,26 @@ export default function LoginForm(props) {
     const handleSubmit = async e => {
       e.preventDefault();
       //let user = [ details.username,details.password] ;
-      const response = await axios.get(
-        `http://localhost:8000/users?username=${details.username}`);
-      // set the state of the user
-      props.stateHandler(response.data);
-        console.log(response.data);
+      axios.post('/login', {
+        username: details.username,
+        password: details.password
+      })
+      .then((response) => {
+        console.log(response);
         console.log(Object.keys(response.data));
         // store the user in localStorage
         if(Object.keys(response.data).length !== 0){
           sessionStorage.setItem("logged_user", response.data[0].username);
         }
-      }
+      }, (error) => {
+        console.log(error);
+      });
+    }
+
+
+
+
+     
 
       
   
