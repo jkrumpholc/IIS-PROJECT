@@ -10,10 +10,11 @@ export default function LoginForm(props) {
     const handleSubmit = async e => {
       e.preventDefault();
       //let user = [ details.username,details.password] ;
-      axios.post('/login', {
+      axios.post('http://localhost:8000/login', {
         username: details.username,
         password: details.password
       })
+
       .then((response) => {
         console.log(response);
         console.log(Object.keys(response.data));
