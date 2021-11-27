@@ -1,13 +1,12 @@
 import React from 'react'
+import { Link } from 'react-router-dom';
 
 export const User = (props) => {
 
     const numbers = [1, 2, 3, 4, 5];
     const listItems = numbers.map((number,index) =>
 
-    <li key={index} >{
-        number 
-        }</li>
+    <Link to="/clicked_ticket"><li key={index} >{number}</li></Link>
     );
     
     return (
