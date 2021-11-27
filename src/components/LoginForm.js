@@ -14,7 +14,7 @@ export default function LoginForm(props) {
 
       e.preventDefault();
       //let user = [ details.username,details.password] ;
-      const response = await axios.post('/login', {
+      const response = await axios.post('/loginUser', {
         username: details.username,
         password: details.password,
 
