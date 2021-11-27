@@ -3,23 +3,7 @@ import './LoginForm.css';
 import axios from "axios";
 
 import { Register } from './Register';
-axios.defaults.baseURL = 'http://localhost:3000/';
-axios.defaults.headers.post['Content-Type'] ='application/json;charset=utf-8';
-axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
 
-
-
-
-async function loginUser(credentials) {
-  return fetch('http://localhost:8000/login', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(credentials)
-  })
-    .then(data => data.json())
- }
 
 
 export default function LoginForm(props) {
@@ -30,16 +14,7 @@ export default function LoginForm(props) {
 
       e.preventDefault();
       //let user = [ details.username,details.password] ;
-
-      const response = await loginUser({
-        username:details.username,
-        password:details.password
-      });
-      
-      
-
-      /*
-      const response = await axios.post('http://localhost:8000/login', {
+      const response = await axios.post('/loginUser', {
         username: details.username,
         password: details.password,
 
@@ -47,10 +22,8 @@ export default function LoginForm(props) {
       // set the state of the user
       
       console.log(response.data);
-      
-      */
       props.stateHandler(response);
-        if(response['result']=="Success"){
+        if(response['result']==="Success"){
 
           sessionStorage.setItem("logged_user", JSON.stringify(response));
         }

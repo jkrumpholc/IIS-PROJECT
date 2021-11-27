@@ -1,2 +1,1 @@
-worker: python3 src/main.py
-web: npm start
+web: gunicorn main:app
