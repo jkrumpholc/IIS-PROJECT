@@ -124,7 +124,11 @@ def handle_bad_request(e):
 
 
 @app.route('/')
+@app.route('/konference')
 @app.route('/login')
+@app.route('/user')
+@app.route('/clicked_konf')
+@app.route('/clicked_ticket')
 @cross_origin()
 def serve():
     return send_from_directory(app.static_folder, 'index.html')
