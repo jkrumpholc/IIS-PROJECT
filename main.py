@@ -123,7 +123,7 @@ def handle_bad_request(e):
     return 'bad request! 404', 404
 
 
-@app.route('/')
+@app.route('*')
 @cross_origin()
 def serve():
     return send_from_directory(app.static_folder, 'index.html')
