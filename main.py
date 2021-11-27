@@ -50,7 +50,7 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 data = Database()
 
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/loginUser', methods=['GET', 'POST'])
 @cross_origin()
 def show_user():
     if request.method == 'GET':
