@@ -1,6 +1,6 @@
 import psycopg2
 from werkzeug import exceptions
-from flask.helpers import send_from_directory 
+from flask.helpers import send_from_directory
 from flask import Flask, request
 from flask_cors import CORS, cross_origin
 import hashlib
@@ -60,8 +60,7 @@ def show_user():
         username = request.json['username']
         password = request.json['password']
     else:
-        username = None
-        password = None
+        username = password = None
     if None in (username, password):
         ret = {"result": "Failure"}
         return json.dumps(ret)
@@ -95,19 +94,40 @@ def register():
         surname = request.json['surname']
         gender = request.json['gender']
     else:
-        username = None
-        password = None
-        name = None
-        surname = None
-        gender = None
+        username = password = name = surname = gender = None
     if None in (username, password, name, surname, gender):
         ret = {"result": "Failure"}
         return json.dumps(ret)
-    user_id = (data.send_request('''SELECT MAX(id) FROM public."User"''', True)[1][0])+1
+    user_id = (data.send_request('''SELECT MAX(id) FROM public."User"''', True)[1][0]) + 1
     passwd_hash = (hashlib.md5(password.encode())).hexdigest()
     if data.send_request(f'''INSERT INTO public."User"(id, username, name, surname, gender, password)  VALUES
                      ('{user_id}', '{username}', '{name}', '{surname}', '{gender}', '{passwd_hash}' )''', False):
         ret = {"result": "Success", "id": user_id}
+        return ret
+
+
+@app.route('/addConference', methods=['GET', 'POST'])
+@cross_origin()
+def create_conference():
+    if request.method == 'GET' or request.method == 'POST':
+        organizer = request.args.get('organizer') if request.method == 'GET' else request.json['organizer']
+        description = request.args.get('description') if request.method == 'GET' else request.json['description']
+        genre = request.args.get('genre') if request.method == 'GET' else request.json['genre']
+        address = request.args.get('address') if request.method == 'GET' else request.json['address']
+        rooms = request.args.get('rooms') if request.method == 'GET' else request.json['rooms']
+        capacity = request.args.get('capacity') if request.method == 'GET' else request.json['capacity']
+        timeTo = request.args.get('timeTo') if request.method == 'GET' else request.json['timeTo']
+        timeFrom = request.args.get('timeFrom') if request.method == 'GET' else request.json['timeFrom']
+    else:
+        organizer = description = genre = address = rooms = capacity = timeTo = timeFrom = None
+    if None in (organizer, description, genre, address, rooms, capacity, timeTo, timeFrom):
+        ret = {"result": "Failure"}
+        return json.dumps(ret)
+    conference_id = (data.send_request('''SELECT MAX(id) FROM public."Conference"''')[1][0]) + 1
+    if data.send_request(f'''INSERT INTO public."Conference"(id, capacity, description, address, genre, organizer,
+    rooms, begin_time, end_time) VALUES ('{conference_id}','{capacity}','{description}','{address}','{genre}',
+    '{organizer}','{rooms}','{timeFrom}','{timeTo}') ''', False):
+        ret = {"result": "Success", "id": conference_id}
         return ret
 
 
