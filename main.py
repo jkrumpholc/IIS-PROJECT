@@ -1,5 +1,6 @@
 import psycopg2
 from werkzeug import exceptions
+from flask.helpers import send_from_directory 
 from flask import Flask, request
 from flask_cors import CORS, cross_origin
 import hashlib
@@ -39,10 +40,12 @@ class Database:
                 self.conn.commit()
             return ret
 
+    def get_user_tickets(self):
+        self.send_request("""SELECT * FROM public."Ticket" where (public."Ticket"."user" == public."User".id)""", True)
 
 
-app = Flask(__name__)
-cors = CORS(app)
+app = Flask(__name__, static_folder='build', static_url_path='')
+CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 data = Database()
 
@@ -120,5 +123,11 @@ def handle_bad_request(e):
     return 'bad request! 404', 404
 
 
+@app.route('/')
+@cross_origin()
+def serve():
+    return send_from_directory(app.static_folder, 'index.html')
+
+
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=8000)
+    app.run(debug=True, port=8000)
