@@ -1,6 +1,7 @@
 import React, { useState , useEffect } from 'react';
 import './App.css';
 import { Header  } from './components/Header';
+import { Schedule } from './components/Schedule';
 
 import { BrowserRouter as Router, Routes ,Route } from 'react-router-dom';
 import LoginForm from './components/LoginForm';
@@ -45,7 +46,7 @@ function App() {
         <Route path="/konference" element={<Miestnosti  user={user} konfStateHandler={konfStateHandler} />}/> 
         <Route path="/user" element={<User user ={user}/>}/> 
         <Route path="/clicked_konf" element={<Clicked_konf selected_konf={selected_konf}/>}/> 
-
+        <Route path="/clicked_ticket" element={<Schedule user={user}/>}/> 
       </Routes>
 
       
