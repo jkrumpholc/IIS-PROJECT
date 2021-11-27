@@ -3,9 +3,7 @@ import './LoginForm.css';
 import axios from "axios";
 
 import { Register } from './Register';
-axios.defaults.baseURL = 'http://localhost:3000/';
-axios.defaults.headers.post['Content-Type'] ='application/json;charset=utf-8';
-axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
+
 
 
 export default function LoginForm(props) {
@@ -16,7 +14,7 @@ export default function LoginForm(props) {
 
       e.preventDefault();
       //let user = [ details.username,details.password] ;
-      const response = await axios.post('http://0.0.0.0:8000/login', {
+      const response = await axios.post('/login', {
         username: details.username,
         password: details.password,
 
