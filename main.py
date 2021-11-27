@@ -40,9 +40,6 @@ class Database:
                 self.conn.commit()
             return ret
 
-    def get_user_tickets(self):
-        self.send_request("""SELECT * FROM public."Ticket" where (public."Ticket"."user" == public."User".id)""", True)
-
 
 app = Flask(__name__, static_folder='build', static_url_path='')
 CORS(app)
@@ -52,19 +49,16 @@ data = Database()
 
 @app.route('/loginUser', methods=['GET', 'POST'])
 @cross_origin()
-def show_user():
-    if request.method == 'GET':
-        username = request.args.get('username', None)
-        password = request.args.get('password', None)
-    elif request.method == 'POST':
-        username = request.json['username']
-        password = request.json['password']
+def login_user():
+    if request.method == 'GET' or request.method == 'POST':
+        username = request.args.get('username') if request.method == 'GET' else request.json['username']
+        password = request.args.get('password') if request.method == 'GET' else request.json['password']
     else:
         username = password = None
     if None in (username, password):
         ret = {"result": "Failure"}
         return json.dumps(ret)
-    database_data = data.send_request(f"""SELECT password, id from public."User" where username = '{username}'""", True)
+    database_data = data.send_request(f'''SELECT password,id from public."User" where username = '{username}' ''', True)
     if database_data[0]:
         data_pass = database_data[1][0]
         data_id = database_data[1][1]
@@ -81,18 +75,12 @@ def show_user():
 @app.route('/addUser', methods=['GET', 'POST'])
 @cross_origin()
 def register():
-    if request.method == 'GET':
-        username = request.args.get('username', None)
-        password = request.args.get('password', None)
-        name = request.args.get('name', None)
-        surname = request.args.get('surname', None)
-        gender = request.args.get('gender', None)
-    elif request.method == 'POST':
-        username = request.json['username']
-        password = request.json['password']
-        name = request.json['name']
-        surname = request.json['surname']
-        gender = request.json['gender']
+    if request.method == 'GET' or request.method == 'POST':
+        username = request.args.get('username') if request.method == 'GET' else request.json['username']
+        password = request.args.get('password') if request.method == 'GET' else request.json['password']
+        name = request.args.get('name') if request.method == 'GET' else request.json['name']
+        surname = request.args.get('surname') if request.method == 'GET' else request.json['surname']
+        gender = request.args.get('gender') if request.method == 'GET' else request.json['gender']
     else:
         username = password = name = surname = gender = None
     if None in (username, password, name, surname, gender):
@@ -129,6 +117,52 @@ def create_conference():
     '{organizer}','{rooms}','{timeFrom}','{timeTo}') ''', False):
         ret = {"result": "Success", "id": conference_id}
         return ret
+
+
+@app.route('/profile', methods=['GET', 'POST'])
+@cross_origin()
+def profile():
+    if request.method == 'GET' or request.method == 'POST':
+        user_id = request.args.get('id') if request.method == 'GET' else request.json['id']
+    else:
+        user_id = None
+    if user_id is None:
+        ret = {"result": "Failure", "reason": "No user_id provided"}
+        return json.dumps(ret)
+    user_id = int(user_id)
+    database_data = data.send_request(f'''SELECT id, price, conference, status FROM public."Ticket" WHERE 
+                                        "user" = {user_id} ORDER BY id DESC ''')
+    if database_data[0]:
+        user_tickets = database_data[1]
+        if len(user_tickets) > 5:
+            user_tickets = user_tickets[:5]
+        print(user_tickets)
+    else:
+        ret = {"result": "Failure", "reason": "Cannot get tickets"}
+        return json.dumps(ret)
+    database_data = data.send_request(f'''SELECT id,capacity,description,address,participants,begin_time,end_time FROM 
+                                            public."Conference" WHERE organizer = {user_id} ORDER BY id DESC ''')
+    if database_data[0]:
+        user_conferences = database_data[1]
+        if len(user_conferences) > 5:
+            user_conferences = user_conferences[:5]
+        print(user_conferences)
+    else:
+        ret = {"result": "Failure", "reason": "Cannot get conferencies"}
+        return json.dumps(ret)
+    database_data = data.send_request(f'''SELECT id,name,description,conference,room,begin_time,end_time,confirmed FROM 
+                                     public."Presentation" WHERE lecturer = {user_id} ORDER BY id DESC ''')
+    if database_data[0]:
+        user_prezentations = database_data[1]
+        if len(user_prezentations) > 5:
+            user_prezentations = user_prezentations[:5]
+        print(user_prezentations)
+    else:
+        ret = {"result": "Failure", "reason": "Cannot get presentations"}
+        return json.dumps(ret)
+    ret = {"result": "Success", "tickets": user_tickets, "conferencies": user_conferences,
+           "prezentations": user_prezentations}
+    return json.dumps(ret)
 
 
 @app.errorhandler(exceptions.InternalServerError)
