@@ -23,6 +23,8 @@ function App() {
   }
 
   useEffect(() => {
+
+    
     const loggedInUser = JSON.parse(sessionStorage.getItem("logged_user"))
     
     

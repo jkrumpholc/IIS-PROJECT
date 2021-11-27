@@ -1,5 +1,8 @@
-import React from 'react'
+
 import { Link } from 'react-router-dom';
+import React, { useState , useEffect } from 'react';
+import axios from "axios";
+
 export const User = (props) => {
 
     const numbers = [1, 2, 3, 4, 5];
@@ -8,7 +11,15 @@ export const User = (props) => {
     <Link to="/clicked_ticket"><li key={index} >{number}</li></Link>
     );
     
+    useEffect(() => {
+        
 
+        
+
+        return () => {
+            
+        }
+    }, [])
         
 
 
