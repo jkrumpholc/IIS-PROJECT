@@ -207,10 +207,15 @@ def create_ticket(send_mail=False):
 @app.route('/availableConferences', methods=['GET', 'POST'])
 @cross_origin()
 def get_conferencies():
-    print("Hello")
+    conferencies_fileds = ['id', 'capacity','description','address','genre','participants','rooms','begin_time','end_time', 'organizer', 'price']
     database_data = send_request('''SELECT * FROM public."Conference"''')
     if database_data[0]:
-        temp_data = database_data[1]
+        conferencies = parse_profile_data(database_data[1],conferencies_fileds)
+        ret = {"result": "Success", "conferencies": conferencies}
+        return ret
+    else:
+        ret = {"result": "Failure"}
+        return ret
 
 
 @app.errorhandler(exceptions.InternalServerError)
