@@ -5,6 +5,7 @@ from flask import Flask, request
 from flask_cors import CORS, cross_origin
 import hashlib
 import json
+import datetime
 
 
 class Database:
@@ -30,7 +31,7 @@ class Database:
         else:
             if read:
                 try:
-                    ret = (True, self.cur.fetchall()[0])
+                    ret = (True, self.cur.fetchall())
                 except psycopg2.ProgrammingError:
                     ret = False
             else:
@@ -60,8 +61,8 @@ def login_user():
         return json.dumps(ret)
     database_data = data.send_request(f'''SELECT password,id from public."User" where username = '{username}' ''', True)
     if database_data[0]:
-        data_pass = database_data[1][0]
-        data_id = database_data[1][1]
+        data_pass = database_data[1][0][0]
+        data_id = database_data[1][0][1]
         passwd_hash = (hashlib.md5(password.encode())).hexdigest()
         if data_pass == passwd_hash:
             ret = {"result": "Success", "id": data_id}
@@ -86,7 +87,7 @@ def register():
     if None in (username, password, name, surname, gender):
         ret = {"result": "Failure"}
         return json.dumps(ret)
-    user_id = (data.send_request('''SELECT MAX(id) FROM public."User"''', True)[1][0]) + 1
+    user_id = (data.send_request('''SELECT MAX(id) FROM public."User"''', True)[1][0][0]) + 1
     passwd_hash = (hashlib.md5(password.encode())).hexdigest()
     if data.send_request(f'''INSERT INTO public."User"(id, username, name, surname, gender, password)  VALUES
                      ('{user_id}', '{username}', '{name}', '{surname}', '{gender}', '{passwd_hash}' )''', False):
@@ -111,12 +112,25 @@ def create_conference():
     if None in (organizer, description, genre, address, rooms, capacity, timeTo, timeFrom):
         ret = {"result": "Failure"}
         return json.dumps(ret)
-    conference_id = (data.send_request('''SELECT MAX(id) FROM public."Conference"''')[1][0]) + 1
+    conference_id = (data.send_request('''SELECT MAX(id) FROM public."Conference"''')[1][0][0]) + 1
     if data.send_request(f'''INSERT INTO public."Conference"(id, capacity, description, address, genre, organizer,
     rooms, begin_time, end_time) VALUES ('{conference_id}','{capacity}','{description}','{address}','{genre}',
     '{organizer}','{rooms}','{timeFrom}','{timeTo}') ''', False):
         ret = {"result": "Success", "id": conference_id}
         return ret
+
+
+def parse_profile_data(temp_data, fields):
+    user_data = {}
+    if len(temp_data) > 5:
+        temp_data = temp_data[:5]
+    for n, i in enumerate(temp_data, 1):
+        user_data[n] = []
+        for j, k in zip(i, fields):
+            if type(j) == datetime.time:
+                j = datetime.time.strftime(j, "%H:%M")
+            user_data[n].append(f'{k}: {j}')
+    return user_data
 
 
 @app.route('/profile', methods=['GET', 'POST'])
@@ -130,37 +144,32 @@ def profile():
         ret = {"result": "Failure", "reason": "No user_id provided"}
         return json.dumps(ret)
     user_id = int(user_id)
-    database_data = data.send_request(f'''SELECT id, price, conference, status FROM public."Ticket" WHERE 
-                                        "user" = {user_id} ORDER BY id DESC ''')
+    ticket_fields = ['id', 'price', 'conference', 'status']
+    database_data = data.send_request(
+        f'''SELECT T.id, price, description, status FROM public."Ticket" T natural join "Conference" C where T.conference = C.id and T."user" = {user_id} ORDER BY id DESC ''')
     if database_data[0]:
-        user_tickets = database_data[1]
-        if len(user_tickets) > 5:
-            user_tickets = user_tickets[:5]
-        print(user_tickets)
+        user_tickets = parse_profile_data(database_data[1],ticket_fields)
     else:
         ret = {"result": "Failure", "reason": "Cannot get tickets"}
         return json.dumps(ret)
-    database_data = data.send_request(f'''SELECT id,capacity,description,address,participants,begin_time,end_time FROM 
-                                            public."Conference" WHERE organizer = {user_id} ORDER BY id DESC ''')
+    conference_fields = ['id', 'capacity', 'description', 'address', 'participants', 'begin_time', 'end_time']
+    database_data = data.send_request(
+        f'''SELECT id,capacity,description,address,participants,begin_time,end_time FROM public."Conference" WHERE organizer = {user_id} ORDER BY id DESC ''')
     if database_data[0]:
-        user_conferences = database_data[1]
-        if len(user_conferences) > 5:
-            user_conferences = user_conferences[:5]
-        print(user_conferences)
+        user_conferencies = parse_profile_data(database_data[1], conference_fields)
     else:
         ret = {"result": "Failure", "reason": "Cannot get conferencies"}
         return json.dumps(ret)
-    database_data = data.send_request(f'''SELECT id,name,description,conference,room,begin_time,end_time,confirmed FROM 
-                                     public."Presentation" WHERE lecturer = {user_id} ORDER BY id DESC ''')
+    prezentations_fields = ['id', 'name', 'conference_name', 'room_name', 'begin_time', 'end_time', 'confirmed']
+    database_data = data.send_request(f'''
+            SELECT P.id,P.name,C.description,R.name,P.begin_time,P.end_time,P.confirmed FROM public."Presentation" P, 
+            "Conference" C, "Room" R where conference=C.id and room=R.id and lecturer={user_id} ORDER BY id DESC ''')
     if database_data[0]:
-        user_prezentations = database_data[1]
-        if len(user_prezentations) > 5:
-            user_prezentations = user_prezentations[:5]
-        print(user_prezentations)
+        user_prezentations = parse_profile_data(database_data[1], prezentations_fields)
     else:
         ret = {"result": "Failure", "reason": "Cannot get presentations"}
         return json.dumps(ret)
-    ret = {"result": "Success", "tickets": user_tickets, "conferencies": user_conferences,
+    ret = {"result": "Success", "tickets": user_tickets, "conferencies": user_conferencies,
            "prezentations": user_prezentations}
     return json.dumps(ret)
 
@@ -168,7 +177,7 @@ def profile():
 @app.errorhandler(exceptions.InternalServerError)
 def handle_bad_request(e):
     print(e)
-    return 'bad request! 500', 500
+    return 'bad request! 500', 500, e
 
 
 @app.errorhandler(exceptions.NotFound)
