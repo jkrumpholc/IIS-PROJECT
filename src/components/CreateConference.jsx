@@ -9,6 +9,7 @@ export const CreateConference = (props) => {
     const [timeTo, setTimeTo] = useState("");
     const [timeFrom, setTimeFrom] = useState("");
     const [address, setAddress] =useState("FIT");
+    const [price, setPrice] =useState(0);
     const [description, setDescription] =useState("");
     const [genre, setGenre] =useState("");
     const [rooms, setRooms] = useState({room1:"",room2:"",room3:""});
@@ -75,6 +76,7 @@ export const CreateConference = (props) => {
             genre:genre['genre'],
             rooms: r,
             capacity:capacity,
+            price: price['price'],
             timeTo: timeTo["timeTo"],
             timeFrom: timeFrom["timeFrom"]
           })
@@ -121,6 +123,15 @@ export const CreateConference = (props) => {
             <label className="formLabels" > Time To
             <br/>
                 <input onChange={e => setTimeTo({timeTo: e.target.value}) } step="3600" list="times" type="time" id="apptTo" name="appt" required/>
+
+            </label>
+
+
+            
+
+            <label className="formLabels" > Price of a ticket(0-100€)
+            <br/>
+            <input onChange={e=> setPrice({price: e.target.value})}type="number" id="price" name="price" min="0" max="100"/>
 
             </label>
 
