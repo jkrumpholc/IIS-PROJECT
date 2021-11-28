@@ -114,13 +114,13 @@ export const CreateConference = (props) => {
 
             <label className="formLabels" > Time From
             <br/>
-                <input onChange={e => setTimeFrom({timeFrom: e.target.value})}  type="time" id="apptFrom" name="appt" min="09:00" max="20:00" required/>
+                <input onChange={e => setTimeFrom({timeFrom: e.target.value})} step="3600"  list="times" type="time" id="apptFrom" name="appt" required/>
 
             </label>
 
             <label className="formLabels" > Time To
             <br/>
-                <input onChange={e => setTimeTo({timeTo: e.target.value}) }  type="time" id="apptTo" name="appt" min="10:00" max="21:00" required/>
+                <input onChange={e => setTimeTo({timeTo: e.target.value}) } step="3600" list="times" type="time" id="apptTo" name="appt" required/>
 
             </label>
 
@@ -140,7 +140,25 @@ export const CreateConference = (props) => {
             </label>
             <input type="submit" value="Submit" />
            
-
+            <datalist id="times">
+                
+                <option value="07:00:00"/>
+                <option value="08:00:00"/>
+                <option value="09:00:00"/>
+                <option value="10:00:00"/>
+                <option value="11:00:00"/>
+                <option value="12:00:00"/>
+                <option value="13:00:00"/>
+                <option value="14:00:00"/>
+                <option value="15:00:00"/>
+                <option value="16:00:00"/>
+                <option value="17:00:00"/>
+                <option value="18:00:00"/>
+                <option value="19:00:00"/>
+                <option value="20:00:00"/>
+                <option value="21:00:00"/>
+                
+            </datalist>
            
            
         </form>
