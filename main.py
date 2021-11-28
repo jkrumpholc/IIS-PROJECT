@@ -87,6 +87,10 @@ def register():
     if None in (username, password, name, surname, gender):
         ret = {"result": "Failure"}
         return json.dumps(ret)
+    unique = data.send_request(f'''SELECT * FROM public."User" where username = {username} ''')
+    if len(unique[1]) > 1:
+        ret = {"result": "Failure", "reason": "Username exists"}
+        return json.dumps(ret)
     user_id = (data.send_request('''SELECT MAX(id) FROM public."User"''', True)[1][0][0]) + 1
     passwd_hash = (hashlib.md5(password.encode())).hexdigest()
     if data.send_request(f'''INSERT INTO public."User"(id, username, name, surname, gender, password)  VALUES
