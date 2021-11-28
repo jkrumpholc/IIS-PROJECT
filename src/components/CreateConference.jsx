@@ -60,6 +60,9 @@ export const CreateConference = (props) => {
         
         var str1 =timeFrom["timeFrom"];
            var str2 =timeTo["timeTo"];
+
+        if ((isChecked.room3||isChecked.room1||isChecked.room2)){
+            
         if(str1>=str2){
             alert("Invalid time");
         }else{
@@ -81,19 +84,21 @@ export const CreateConference = (props) => {
             timeFrom: timeFrom["timeFrom"]
           })
           .then(function (response) {
-            console.log(response);
+            
+            if(response.data['result']==="Success"){
+                alert("Success");
+                console.log(response);
+            }
+            
           })
           .catch(function (error) {
+            alert("Failed:",error);
             console.log(error);
           });
           
         }
        
-        
-        
-        
-       
-        
+    }else alert("No room selected");
     }
 
     return (
