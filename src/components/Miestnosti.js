@@ -22,17 +22,17 @@ export const Miestnosti = (props) => {
 
     const fetchKonf = async () => {
         const response = await axios.get(`/availableConferences`);
-        return response.data;
+        return response.data['conferencies'];
     }
-    const numbers = [1, 2, 3, 4, 5];
+    /*const numbers = [1, 2, 3, 4, 5];
     const listItems = numbers.map((number,index) =>
 
     <Link to="/clicked_konf"><li key={index} >{number}</li></Link>
-    );
-
-    /*const listItems = Object.values(Konf).map((item) =>
-    <Link to="/clicked_konf"><li onClick={() => {props.konfStateHandler(item)}}>id: {item.id} | popis: {item.description} | žánr: {item.genre} | od: {item.time_from} | do: {item.time_to} | prodané vstupenky: {item.booked_tickets}/{item.max_capacity}</li></Link>
     );*/
+
+    const listItems = Object.values(Konf).map((item) =>
+    <Link to="/clicked_konf"><li onClick={() => {props.konfStateHandler(item)}}>id: {item.id} | popis: {item.description} |  od: {item.begin_time} | do: {item.end_time} | prodané vstupenky: {item.participants}/{item.capacity}</li></Link>
+    );
     
     return (
         <div className = "confWrapper">
