@@ -8,44 +8,41 @@ import json
 import datetime
 
 
-class Database:
-    def __init__(self):
-        self.conn = psycopg2.connect(
-            host="ec2-52-208-145-55.eu-west-1.compute.amazonaws.com",
-            database="d1ol7h4m4fa12e",
-            user="tauerfmxyhknkp",
-            password="b889ddcdadd24f94e7e0f3aceecd92da372334e5663bb7795598250fb860634b",
-            sslmode='require')
-        self.cur = self.conn.cursor()
-
-    def send_request(self, sql, read=True):
-        ret = None
-        try:
-            self.cur.execute(sql)
-        except (Exception, psycopg2.DatabaseError) as error:
-            ret = error
-        except psycopg2.ProgrammingError:
-            ret = f"Wrong SQL request: {sql}"
-        except psycopg2.OperationalError:
-            ret = "Cannot connect to database."
+def send_request(sql, read=True):
+    conn = psycopg2.connect(
+        host="ec2-52-208-145-55.eu-west-1.compute.amazonaws.com",
+        database="d1ol7h4m4fa12e",
+        user="tauerfmxyhknkp",
+        password="b889ddcdadd24f94e7e0f3aceecd92da372334e5663bb7795598250fb860634b",
+        sslmode='require')
+    cur = conn.cursor()
+    ret = None
+    try:
+        cur.execute(sql)
+    except (Exception, psycopg2.DatabaseError) as error:
+        ret = error
+    except psycopg2.ProgrammingError:
+        ret = f"Wrong SQL request: {sql}"
+    except psycopg2.OperationalError:
+        ret = "Cannot connect to database."
+    else:
+        if read:
+            try:
+                ret = (True, cur.fetchall())
+            except psycopg2.ProgrammingError:
+                ret = False
         else:
-            if read:
-                try:
-                    ret = (True, self.cur.fetchall())
-                except psycopg2.ProgrammingError:
-                    ret = False
-            else:
-                ret = True
-        finally:
-            if not read:
-                self.conn.commit()
-            return ret
+            ret = True
+    finally:
+        if not read:
+            conn.commit()
+        conn.close()
+        return ret
 
 
 app = Flask(__name__, static_folder='build', static_url_path='')
 CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
-data = Database()
 
 
 @app.route('/loginUser', methods=['GET', 'POST'])
@@ -59,7 +56,7 @@ def login_user():
     if None in (username, password):
         ret = {"result": "Failure"}
         return json.dumps(ret)
-    database_data = data.send_request(f'''SELECT password from public."User" where username = '{username}' ''', True)
+    database_data = send_request(f'''SELECT password from public."User" where username = '{username}' ''', True)
     if database_data[0]:
         data_pass = database_data[1][0][0]
         passwd_hash = (hashlib.md5(password.encode())).hexdigest()
@@ -86,12 +83,12 @@ def register():
     if None in (username, password, name, surname, gender):
         ret = {"result": "Failure"}
         return json.dumps(ret)
-    unique = data.send_request(f'''SELECT * FROM public."User" where username = {username} ''')
+    unique = send_request(f'''SELECT * FROM public."User" where username = {username} ''')
     if len(unique[1]) > 1:
         ret = {"result": "Failure", "reason": "Username exists"}
         return json.dumps(ret)
     passwd_hash = (hashlib.md5(password.encode())).hexdigest()
-    if data.send_request(f'''INSERT INTO public."User"(username, name, surname, gender, password)  VALUES
+    if send_request(f'''INSERT INTO public."User"(username, name, surname, gender, password)  VALUES
                      ('{username}', '{name}', '{surname}', '{gender}', '{passwd_hash}' )''', False):
         ret = {"result": "Success", "id": username}
         return ret
@@ -111,12 +108,12 @@ def create_conference():
         timeFrom = request.args.get('timeFrom') if request.method == 'GET' else request.json['timeFrom']
         price = request.args.get('price') if request.method == "GET" else request.json['price']
     else:
-        organizer = description = genre = address = rooms = capacity = timeTo = timeFrom = None
-    if None in (organizer, description, genre, address, rooms, capacity, timeTo, timeFrom):
+        organizer = description = genre = address = rooms = capacity = timeTo = timeFrom = price = None
+    if None in (organizer, description, genre, address, rooms, capacity, timeTo, timeFrom, price):
         ret = {"result": "Failure"}
         return json.dumps(ret)
-    conference_id = (data.send_request('''SELECT MAX(id) FROM public."Conference"''')[1][0][0]) + 1
-    if data.send_request(f'''INSERT INTO public."Conference"(id, capacity, description, address, genre, organizer,
+    conference_id = (send_request('''SELECT MAX(id) FROM public."Conference"''')[1][0][0]) + 1
+    if send_request(f'''INSERT INTO public."Conference"(id, capacity, description, address, genre, organizer,
     rooms, begin_time, end_time, price) VALUES ('{conference_id}','{capacity}','{description}','{address}','{genre}',
     '{organizer}','{rooms}','{timeFrom}','{timeTo}','{price}') ''', False):
         ret = {"result": "Success", "id": conference_id}
@@ -147,23 +144,23 @@ def profile():
         ret = {"result": "Failure", "reason": "No username provided"}
         return json.dumps(ret)
     ticket_fields = ['id', 'price', 'conference', 'status']
-    database_data = data.send_request(
+    database_data = send_request(
         f'''SELECT T.id, T.price, description, status FROM public."Ticket" T natural join "Conference" C where T.conference = C.id and T."owner" = '{username}' ORDER BY id DESC ''')
     if database_data[0]:
         user_tickets = parse_profile_data(database_data[1], ticket_fields)
     else:
         ret = {"result": "Failure", "reason": "Cannot get tickets"}
         return json.dumps(ret)
-    conference_fields = ['id', 'capacity', 'description', 'address', 'participants', 'begin_time', 'end_time']
-    database_data = data.send_request(
-        f'''SELECT id,capacity,description,address,participants,begin_time,end_time FROM public."Conference" WHERE organizer = '{username}' ORDER BY id DESC ''')
+    conference_fields = ['id', 'capacity', 'description', 'address', 'participants', 'begin_time', 'end_time', 'price']
+    database_data = send_request(
+        f'''SELECT id,capacity,description,address,participants,begin_time,end_time, price FROM public."Conference" WHERE organizer = '{username}' ORDER BY id DESC ''')
     if database_data[0]:
         user_conferencies = parse_profile_data(database_data[1], conference_fields)
     else:
         ret = {"result": "Failure", "reason": "Cannot get conferencies"}
         return json.dumps(ret)
     prezentations_fields = ['id', 'name', 'conference_name', 'room_name', 'begin_time', 'end_time', 'confirmed']
-    database_data = data.send_request(f'''
+    database_data = send_request(f'''
             SELECT P.id,P.name,C.description,R.name,P.begin_time,P.end_time,P.confirmed FROM public."Presentation" P, 
             "Conference" C, "Room" R where conference=C.id and room=R.id and lecturer='{username}' ORDER BY id DESC ''')
     if database_data[0]:
@@ -192,19 +189,28 @@ def create_ticket(send_mail=False):
     if None in (conference, quantity):
         ret = {"result": "Failure"}
         return json.dumps(ret)
-    ticket_id = (data.send_request(f'''SELECT MAX(id) FROM public."Ticket"''')[1][0][0]) + 1
-    price = (data.send_request(f'''SELECT price FROM public."Conference" where id={conference} ''')[1][0][0]) * quantity
+    ticket_id = (send_request(f'''SELECT MAX(id) FROM public."Ticket"''')[1][0][0]) + 1
+    price = (send_request(f'''SELECT price FROM public."Conference" where id={conference} ''')[1][0][0]) * quantity
     if send_mail:
         pass
     else:
-        check_username = data.send_request(f'''SELECT * FROM public."User" where username = '{username}' ''')
+        check_username = send_request(f'''SELECT * FROM public."User" where username = '{username}' ''')
         if check_username[0] and len(check_username[1]) > 1:
-            if data.send_request(f'''INSERT INTO public."Ticket" (id, price, conference, status, owner) VALUES ('{ticket_id}','{price}','{conference}','{"Reserved"}','{username}')''', False):
+            if send_request(f'''INSERT INTO public."Ticket" (id, price, conference, status, owner) VALUES ('{ticket_id}','{price}','{conference}','{"Reserved"}','{username}')''', False):
                 ret = {"result": "Success"}
                 return json.dumps(ret)
         else:
             ret = {"result": "Failure", "reason": "User not found"}
             return ret
+
+
+@app.route('/availableConferences', methods=['GET', 'POST'])
+@cross_origin()
+def get_conferencies():
+    print("Hello")
+    database_data = send_request('''SELECT * FROM public."Conference"''')
+    if database_data[0]:
+        temp_data = database_data[1]
 
 
 @app.errorhandler(exceptions.InternalServerError)
