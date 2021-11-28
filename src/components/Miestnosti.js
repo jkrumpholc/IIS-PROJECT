@@ -21,7 +21,7 @@ export const Miestnosti = (props) => {
     }, []);
 
     const fetchKonf = async () => {
-        const response = await axios.get(`http://localhost:8000/konferencie`);
+        const response = await axios.get(`/availableConferences`);
         return response.data;
     }
     

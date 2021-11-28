@@ -6,7 +6,7 @@ export const Register = () => {
     const handleregSubmit = async e=> {
         e.preventDefault();
 
-        axios.post('http://localhost:8000/addUser', {
+        axios.post('/addUser', {
             username: regdetails.username,
             password: regdetails.password,
             name:   regdetails.name,

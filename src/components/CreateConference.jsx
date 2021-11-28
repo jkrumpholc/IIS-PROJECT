@@ -46,7 +46,7 @@ export const CreateConference = (props) => {
 
                 break;
             case "FSI":
-                    setRooms({ room1: "1",room2:"2",room3:"3"})
+                    setRooms({ room1: "A1-0538",room2:"A1-0537",room3:"A1-0536"})
 
                     break;
 
