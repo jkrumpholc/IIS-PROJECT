@@ -59,13 +59,12 @@ def login_user():
     if None in (username, password):
         ret = {"result": "Failure"}
         return json.dumps(ret)
-    database_data = data.send_request(f'''SELECT password,id from public."User" where username = '{username}' ''', True)
+    database_data = data.send_request(f'''SELECT password from public."User" where username = '{username}' ''', True)
     if database_data[0]:
         data_pass = database_data[1][0][0]
-        data_id = database_data[1][0][1]
         passwd_hash = (hashlib.md5(password.encode())).hexdigest()
         if data_pass == passwd_hash:
-            ret = {"result": "Success", "id": data_id}
+            ret = {"result": "Success", "id": username}
         else:
             ret = {"result": "Failure"}
     else:
@@ -91,11 +90,10 @@ def register():
     if len(unique[1]) > 1:
         ret = {"result": "Failure", "reason": "Username exists"}
         return json.dumps(ret)
-    user_id = (data.send_request('''SELECT MAX(id) FROM public."User"''', True)[1][0][0]) + 1
     passwd_hash = (hashlib.md5(password.encode())).hexdigest()
-    if data.send_request(f'''INSERT INTO public."User"(id, username, name, surname, gender, password)  VALUES
-                     ('{user_id}', '{username}', '{name}', '{surname}', '{gender}', '{passwd_hash}' )''', False):
-        ret = {"result": "Success", "id": user_id}
+    if data.send_request(f'''INSERT INTO public."User"(username, name, surname, gender, password)  VALUES
+                     ('{username}', '{name}', '{surname}', '{gender}', '{passwd_hash}' )''', False):
+        ret = {"result": "Success", "id": username}
         return ret
 
 
@@ -125,15 +123,15 @@ def create_conference():
 
 
 def parse_profile_data(temp_data, fields):
-    user_data = {}
+    user_data = []
     if len(temp_data) > 5:
         temp_data = temp_data[:5]
-    for n, i in enumerate(temp_data, 1):
-        user_data[n] = []
+    for n, i in enumerate(temp_data, 0):
+        user_data.insert(n, {})
         for j, k in zip(i, fields):
             if type(j) == datetime.time:
                 j = datetime.time.strftime(j, "%H:%M")
-            user_data[n].append(f'{k}: {j}')
+            user_data[n][k] = j
     return user_data
 
 
@@ -141,24 +139,23 @@ def parse_profile_data(temp_data, fields):
 @cross_origin()
 def profile():
     if request.method == 'GET' or request.method == 'POST':
-        user_id = request.args.get('id') if request.method == 'GET' else request.json['id']
+        username = request.args.get('id') if request.method == 'GET' else request.json['id']
     else:
-        user_id = None
-    if user_id is None:
-        ret = {"result": "Failure", "reason": "No user_id provided"}
+        username = None
+    if username is None:
+        ret = {"result": "Failure", "reason": "No username provided"}
         return json.dumps(ret)
-    user_id = int(user_id)
     ticket_fields = ['id', 'price', 'conference', 'status']
     database_data = data.send_request(
-        f'''SELECT T.id, price, description, status FROM public."Ticket" T natural join "Conference" C where T.conference = C.id and T."user" = {user_id} ORDER BY id DESC ''')
+        f'''SELECT T.id, price, description, status FROM public."Ticket" T natural join "Conference" C where T.conference = C.id and T."owner" = '{username}' ORDER BY id DESC ''')
     if database_data[0]:
-        user_tickets = parse_profile_data(database_data[1],ticket_fields)
+        user_tickets = parse_profile_data(database_data[1], ticket_fields)
     else:
         ret = {"result": "Failure", "reason": "Cannot get tickets"}
         return json.dumps(ret)
     conference_fields = ['id', 'capacity', 'description', 'address', 'participants', 'begin_time', 'end_time']
     database_data = data.send_request(
-        f'''SELECT id,capacity,description,address,participants,begin_time,end_time FROM public."Conference" WHERE organizer = {user_id} ORDER BY id DESC ''')
+        f'''SELECT id,capacity,description,address,participants,begin_time,end_time FROM public."Conference" WHERE organizer = '{username}' ORDER BY id DESC ''')
     if database_data[0]:
         user_conferencies = parse_profile_data(database_data[1], conference_fields)
     else:
@@ -167,7 +164,7 @@ def profile():
     prezentations_fields = ['id', 'name', 'conference_name', 'room_name', 'begin_time', 'end_time', 'confirmed']
     database_data = data.send_request(f'''
             SELECT P.id,P.name,C.description,R.name,P.begin_time,P.end_time,P.confirmed FROM public."Presentation" P, 
-            "Conference" C, "Room" R where conference=C.id and room=R.id and lecturer={user_id} ORDER BY id DESC ''')
+            "Conference" C, "Room" R where conference=C.id and room=R.id and lecturer='{username}' ORDER BY id DESC ''')
     if database_data[0]:
         user_prezentations = parse_profile_data(database_data[1], prezentations_fields)
     else:

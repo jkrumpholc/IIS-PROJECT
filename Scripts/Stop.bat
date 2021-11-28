@@ -1,0 +1,1 @@
+heroku ps:stop worker -a project-echelon-mundik

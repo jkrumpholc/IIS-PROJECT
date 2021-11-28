@@ -1,0 +1,1 @@
+heroku ps:restart -a iis-project-2021
