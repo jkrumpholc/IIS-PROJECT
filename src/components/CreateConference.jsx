@@ -4,7 +4,7 @@ import { RoomSelect } from "./RoomSelect";
 import axios from "axios";
 
 
-export const CreateConference = () => {
+export const CreateConference = (props) => {
    // const[roomState,setRoomState]=  useState("");
     const [timeTo, setTimeTo] = useState("");
     const [timeFrom, setTimeFrom] = useState("");
@@ -62,14 +62,16 @@ export const CreateConference = () => {
            var str2 =timeTo["timeTo"];
         if(str1>=str2){
             alert("Invalid time");
-
+        }else{
         const r = JSON.parse('{"'+rooms.room1+'":'+isChecked.room1+','+
             '"'+rooms.room2+'":'+isChecked.room2+','+
             '"'+rooms.room3+'":'+isChecked.room3+
             '}');
 
         axios.post('/addConference', {
+            organizer:props.user["id"],
             description:description,
+            address:address,
             genre:genre,
             rooms: r,
             capacity:capacity,
@@ -82,8 +84,8 @@ export const CreateConference = () => {
           .catch(function (error) {
             console.log(error);
           });
-
         }
+       
         
         
         

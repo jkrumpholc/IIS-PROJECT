@@ -38,7 +38,7 @@ export const Miestnosti = (props) => {
         {props.user["result"]==="Success"&& <span onClick={() =>{ setIsToggledAdd(!isToggledAdd ); setIsToggledReg(false );}} className="addBtn">Add</span>}
         {props.user["result"]==="Success"&& <span onClick={()=> { setIsToggledAdd(false);setIsToggledReg(!isToggledReg  );}} className="addBtn">Registrovať príspevok</span>}
         </div>
-        {isToggledAdd&& <CreateConference/>}
+        {isToggledAdd&& <CreateConference user={props.user}/>}
         {isToggledReg&& <RegisterPresentation/>}
             <ul id="myUL">{listItems}</ul>
         </div>
