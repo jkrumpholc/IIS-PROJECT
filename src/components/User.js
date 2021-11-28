@@ -18,7 +18,9 @@ export const User = (props) => {
 
 
     useEffect(() => {
-       console.log();
+       console.log(Object.keys(props.user).length!==0);
+       
+       if (Object.keys(props.user).length!==0){
         axios.post('/profile', {
             id:props.user['id']
           })
@@ -28,7 +30,7 @@ export const User = (props) => {
           .catch(function (error) {
             console.log(error);
           });
-       
+        }
       },[props.user])
      
 
