@@ -56,8 +56,7 @@ export const CreateConference = (props) => {
 
     const handleAddSubmit = async e=> {
         e.preventDefault();
-
-       
+        
         var str1 =timeFrom["timeFrom"];
            var str2 =timeTo["timeTo"];
         if(str1>=str2){
@@ -68,15 +67,16 @@ export const CreateConference = (props) => {
             '"'+rooms.room3+'":'+isChecked.room3+
             '}');
 
+       
         axios.post('/addConference', {
             organizer:props.user["id"],
-            description:description,
+            description:description['description'],
             address:address,
-            genre:genre,
+            genre:genre['genre'],
             rooms: r,
             capacity:capacity,
-            timeTo: timeTo,
-            timeFrom: timeFrom
+            timeTo: timeTo["timeTo"],
+            timeFrom: timeFrom["timeFrom"]
           })
           .then(function (response) {
             console.log(response);
@@ -84,6 +84,7 @@ export const CreateConference = (props) => {
           .catch(function (error) {
             console.log(error);
           });
+          
         }
        
         

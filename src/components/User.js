@@ -1,5 +1,7 @@
-import React from 'react'
+import React, {Component, useState , useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import axios from "axios";
+
 
 export const User = (props) => {
 
@@ -8,7 +10,29 @@ export const User = (props) => {
 
     <Link to="/clicked_ticket"><li key={index} >{number}</li></Link>
     );
+
+   
+        
     
+   console.log({id:props.user['id']});
+
+
+    useEffect(() => {
+       console.log();
+        axios.post('/profile', {
+            id:props.user['id']
+          })
+          .then(function (response) {
+            console.log(response);
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+       
+      },[props.user])
+     
+
+
     return (
         <div>
             {props.user["result"]==="Success"&&
