@@ -45,7 +45,7 @@ function App() {
         <Route path="/login"  element={<LoginForm  stateHandler={stateHandler} user={user} /> }/>
         <Route path="/konference" element={<Miestnosti  user={user} konfStateHandler={konfStateHandler} />}/> 
         <Route path="/user" element={<User user ={user}/>}/> 
-        <Route path="/clicked_konf" element={<Clicked_konf selected_konf={selected_konf}/>}/> 
+        <Route path="/clicked_konf" element={<Clicked_konf selected_konf={selected_konf} user ={user}/>}/> 
         <Route path="/clicked_ticket" element={<Schedule user={user}/>}/> 
 
       </Routes>
