@@ -109,6 +109,7 @@ def create_conference():
         capacity = request.args.get('capacity') if request.method == 'GET' else request.json['capacity']
         timeTo = request.args.get('timeTo') if request.method == 'GET' else request.json['timeTo']
         timeFrom = request.args.get('timeFrom') if request.method == 'GET' else request.json['timeFrom']
+        price = request.args.get('price') if request.method == "GET" else request.json['price']
     else:
         organizer = description = genre = address = rooms = capacity = timeTo = timeFrom = None
     if None in (organizer, description, genre, address, rooms, capacity, timeTo, timeFrom):
@@ -116,8 +117,8 @@ def create_conference():
         return json.dumps(ret)
     conference_id = (data.send_request('''SELECT MAX(id) FROM public."Conference"''')[1][0][0]) + 1
     if data.send_request(f'''INSERT INTO public."Conference"(id, capacity, description, address, genre, organizer,
-    rooms, begin_time, end_time) VALUES ('{conference_id}','{capacity}','{description}','{address}','{genre}',
-    '{organizer}','{rooms}','{timeFrom}','{timeTo}') ''', False):
+    rooms, begin_time, end_time, price) VALUES ('{conference_id}','{capacity}','{description}','{address}','{genre}',
+    '{organizer}','{rooms}','{timeFrom}','{timeTo}','{price}') ''', False):
         ret = {"result": "Success", "id": conference_id}
         return ret
 
@@ -147,7 +148,7 @@ def profile():
         return json.dumps(ret)
     ticket_fields = ['id', 'price', 'conference', 'status']
     database_data = data.send_request(
-        f'''SELECT T.id, price, description, status FROM public."Ticket" T natural join "Conference" C where T.conference = C.id and T."owner" = '{username}' ORDER BY id DESC ''')
+        f'''SELECT T.id, T.price, description, status FROM public."Ticket" T natural join "Conference" C where T.conference = C.id and T."owner" = '{username}' ORDER BY id DESC ''')
     if database_data[0]:
         user_tickets = parse_profile_data(database_data[1], ticket_fields)
     else:
@@ -173,6 +174,37 @@ def profile():
     ret = {"result": "Success", "tickets": user_tickets, "conferencies": user_conferencies,
            "prezentations": user_prezentations}
     return json.dumps(ret)
+
+
+@app.route('/reserveTicket', methods=['GET', 'POST'])
+@cross_origin()
+def create_ticket(send_mail=False):
+    if request.method == 'GET' or request.method == 'POST':
+        try:
+            username = request.args.get('username') if request.method == 'GET' else request.json['username']
+        except IndexError:
+            send_mail = True
+            mail = request.args.get('mail') if request.method == 'GET' else request.json['mail']
+        conference = request.args.get('conference') if request.method == 'GET' else request.json['conference']
+        quantity = request.args.get('quantity') if request.method == 'GET' else request.json['quantity']
+    else:
+        username = conference = quantity = None
+    if None in (conference, quantity):
+        ret = {"result": "Failure"}
+        return json.dumps(ret)
+    ticket_id = (data.send_request(f'''SELECT MAX(id) FROM public."Ticket"''')[1][0][0]) + 1
+    price = (data.send_request(f'''SELECT price FROM public."Conference" where id={conference} ''')[1][0][0]) * quantity
+    if send_mail:
+        pass
+    else:
+        check_username = data.send_request(f'''SELECT * FROM public."User" where username = '{username}' ''')
+        if check_username[0] and len(check_username[1]) > 1:
+            if data.send_request(f'''INSERT INTO public."Ticket" (id, price, conference, status, owner) VALUES ('{ticket_id}','{price}','{conference}','{"Reserved"}','{username}')''', False):
+                ret = {"result": "Success"}
+                return json.dumps(ret)
+        else:
+            ret = {"result": "Failure", "reason": "User not found"}
+            return ret
 
 
 @app.errorhandler(exceptions.InternalServerError)
