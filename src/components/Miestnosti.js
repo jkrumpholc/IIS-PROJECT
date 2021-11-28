@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 export const Miestnosti = (props) => {
     
     const [isToggledAdd, setIsToggledAdd] = useState(false);
-    const [isToggledReg, setIsToggledReg] = useState(false);
+    //const [isToggledReg, setIsToggledReg] = useState(false);
     const [Konf, setKonf] = useState([]);
 
     useEffect(() => {
@@ -40,11 +40,10 @@ export const Miestnosti = (props) => {
             <h2>Konference</h2>
         <label for="myInput" style={{float:"left"}}>Search</label>  
         <input type="text" id="myInput" placeholder="Conference title..."/>
-        {props.user["result"]==="Success"&& <span onClick={() =>{ setIsToggledAdd(!isToggledAdd ); setIsToggledReg(false );}} className="addBtn">Add</span>}
-        {props.user["result"]==="Success"&& <span onClick={()=> { setIsToggledAdd(false);setIsToggledReg(!isToggledReg  );}} className="addBtn">Registrovať príspevok</span>}
+        {props.user["result"]==="Success"&& <span onClick={() =>{ setIsToggledAdd(!isToggledAdd );}} className="addBtn">Add</span>}
         </div>
         {isToggledAdd&& <CreateConference user={props.user}/>}
-        {isToggledReg&& <RegisterPresentation/>}
+        
             <ul id="myUL">{listItems}</ul>
         </div>
     )
