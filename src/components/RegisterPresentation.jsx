@@ -30,46 +30,51 @@ export const RegisterPresentation = (props) => {
             console.log(selectedFile);
             const formData = new FormData();
             formData.append('file', selectedFile);
-            /*console.log({
-            room_id: props.selectedRoom.id,
-            username: props.user['id'],
-            conf_id: props.selected_konf.id,
-            data: formData,
-            timeFrom: timeFrom['timeFrom'],
-            timeTo: timeTo['timeTo'],
-            presName: presName['presName'],
-            presTags: presTags['presTags'],
-            description:description['description'],
-            headers: { "Content-Type": "multipart/form-data" }})*/
+      
+
             
-            axios({
-                method: "post",
-                url: "/registerPresentation",
+            axios.post('/registerPresentation', {
                 room_id: props.selectedRoom.id,
                 username: props.user['id'],
                 conf_id: props.selected_konf.id,
-                data: formData,
                 timeFrom: timeFrom['timeFrom'],
                 timeTo: timeTo['timeTo'],
                 presName: presName['presName'],
                 presTags: presTags['presTags'],
-                description:description['description'],
+                description:description['description']
+              })
+              .then(function (response) {
+                let info=response.data;
+              })
+              .catch(function (error) {
+                console.log(error);
+              });
+              
+            if(info['result']==="Success"){
+            axios({
+                method: "post",
+                url: "/registerPresentationFile",
+                
+                data: formData,
+
                 headers: { "Content-Type": "multipart/form-data" },
                 })
                 .then(function (response) {
-            
+
                 if(response.data['result']==="Success"){
                     alert("Success");
                     console.log(response);
                 }
-                
                 })
                 .catch(function (error) {
                 alert("Failed:",error);
                 console.log(error);
                 });
+
+            }
                 
-         
+                
+
 
         }else{
             alert("Please select time in conference interval");
