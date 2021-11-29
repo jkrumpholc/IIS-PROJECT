@@ -393,7 +393,10 @@ def delete():
     if None in (to_delete, id_):
         ret = {"result": "Failure", "reason": "Data not provided"}
         return json.dumps(ret)
-    result = data.send_request(f'''DELETE FROM public."{to_delete}" WHERE id = {id_}''', False)
+    if to_delete == "User":
+        result = data.send_request(f'''DELETE FROM public."{to_delete}" WHERE username = {id_}''', False)
+    else:
+        result = data.send_request(f'''DELETE FROM public."{to_delete}" WHERE id = {id_}''', False)
     if result and type(result) == bool:
         ret = {"result": "Success"}
     else:
