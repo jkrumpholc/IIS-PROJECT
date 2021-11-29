@@ -15,13 +15,14 @@ export const User = (props) => {
     );*/
 
   const listItems1 = Object.values(Konf).map((item) =>
-    <li>id: {item.id} | popis: {item.description} |  od: {item.begin_time} | do: {item.end_time} | prodané vstupenky: {item.participants}/{item.capacity} | date : {item.date} </li>
+    
+  <Link to="/myConference"><li onClick={() => {props.konfStateHandler(item)}}>id: {item.id} | description: {item.description} |  from: {item.begin_time} | to: {item.end_time} | sold tickets: {item.participants}/{item.capacity} | date : {item.date} </li></Link>
   );
   const listItems2 = Object.values(pres).map((item) =>
-    <li>id: {item.id} | názov prezentácie: {item.name} | konference: {item.conference_name} | od: {item.begin_time} | do: {item.end_time} | potvrzeno: {item.confirmed ? "Ano":"Ne"}</li>
+    <li>id: {item.id} | presentation description: {item.name} | conference: {item.conference_name} | from: {item.begin_time} | to: {item.end_time} | confirmed: {item.confirmed ? "Yes":"No"}</li>
   );
   const listItems3 = Object.values(tick).map((item) =>
-    <li>id: {item.id} | konference: {item.conference} | cena: {item.price} | stav: {item.status}</li>
+    <li>id: {item.id} | conference: {item.conference} | price: {item.price} | state: {item.status}</li>
   );
         
   console.log({id:props.user['id']});
@@ -56,15 +57,15 @@ export const User = (props) => {
                 <p>logged in: {props.user["id"] }</p>
             }
             {props.user["result"]==="Success"&& <div>
-                <p>Moje konferencie</p>
+                <p>My conferencies</p>
                 <ul>{listItems1}</ul></div>
             }
             {props.user["result"]==="Success"&& <div>
-                <p>Moje prezentacie</p>
+                <p>My presentations</p>
                 <ul>{listItems2}</ul></div>
             }
             {props.user["result"]==="Success" && <div>
-                <p>Moje vstupekny</p>
+                <p>My tickets</p>
                 <ul>{listItems3}</ul></div>
             }
         </div>

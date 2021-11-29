@@ -12,6 +12,7 @@ export const RegisterPresentation = (props) => {
 
     const changeHandler = (event) => {
         if(event.target.files[0]!==undefined){
+            
 		    setSelectedFile(event.target.files[0]);
 		    setIsFilePicked(true);
         }
@@ -25,30 +26,30 @@ export const RegisterPresentation = (props) => {
            
         
         
-
+            console.log(selectedFile);
             const formData = new FormData();
-            formData.append('File', selectedFile);
-            console.log(props.user['id']);
-            axios.post("/registerPresentation",{
-                
-            conferenceID:props.selected_konf['id'],
-            timeTo: timeTo["timeTo"],
-            timeFrom: timeFrom["timeFrom"],
-            data : formData
-
-            }).then(function (response) {
+            formData.append('file', selectedFile);
+            
+            axios({
+                method: "post",
+                url: "/registerPresentation",
+                data: formData,
+                headers: { "Content-Type": "multipart/form-data" },
+                })
+                .then(function (response) {
             
                 if(response.data['result']==="Success"){
                     alert("Success");
                     console.log(response);
                 }
                 
-              })
-              .catch(function (error) {
+                })
+                .catch(function (error) {
                 alert("Failed:",error);
                 console.log(error);
-              });
-
+                });
+            
+         
 
         }else{
             alert("Please select time in conference interval");

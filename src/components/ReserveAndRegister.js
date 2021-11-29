@@ -7,7 +7,9 @@ export const ReserveAndRegister = (props) => {
 
     const SubmitResAndReg = async e=> {
         e.preventDefault();
-        //console.log(ticketDetails)
+        console.log(ticketDetails.quantity)
+
+        if(ticketDetails.quantity <=5 && ticketDetails.quantity >0){
         await axios.post('/addUser', {
             username: regdetails.username,
             password: regdetails.password,
@@ -32,9 +34,14 @@ export const ReserveAndRegister = (props) => {
           .catch(function (error) {
             console.log(error);
           });
+        }else
+          alert("You can reserve max 5 tickets");
     }
+
     const SubmitRes = async e=> {
         e.preventDefault();
+        
+        if(ticketDetails.quantity <=5 && ticketDetails.quantity >0){
         if(props.user['result']==='Success'){
             axios.post('/reserveTicket', {
                 username: props.user['id'],
@@ -61,7 +68,8 @@ export const ReserveAndRegister = (props) => {
                 console.log(error);
               });
         }
-        
+      }else
+        alert("You can reserve max 5 tickets");
     }
 
     return (
