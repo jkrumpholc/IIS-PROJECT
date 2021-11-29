@@ -121,8 +121,6 @@ def create_conference():
     conference_id += 1
     if data.send_request(
             f'''INSERT INTO public."Conference"(id,capacity,description,address,genre,organizer,begin_time,end_time,price) VALUES ({conference_id},{capacity},'{description}','{address}','{genre}','{organizer}','{timeFrom}','{timeTo}',{price}) ''',False):
-        room_count = 0
-        room_list = ""
         building = data.send_request(f'''SELECT id FROM public."Building" where name = '{address}' ''')[1][0][0]
         for i in rooms:
             if rooms[i]:
@@ -180,7 +178,7 @@ def profile():
         return json.dumps(ret)
     prezentations_fields = ['id', 'name', 'conference_name', 'room_name', 'begin_time', 'end_time', 'confirmed']
     result, database_data = data.send_request(
-        f'''SELECT P.id,P.name,C.description,R.name,P.begin_time,P.end_time,P.confirmed FROM public."Presentation" P, "Conference" C, "Room" R where conference=C.id and room=R.id and lecturer='{username}' ORDER BY id DESC ''')
+        f'''SELECT P.id,P.name,C.description,R.name,P.begin_time,P.end_time,P.confirmed FROM public."Presentation" P, "Conference" C, "Room" R where conference=C.id and C.id=R.conferention and lecturer='{username}' ORDER BY id DESC ''')
     if result:
         user_prezentations = parse_profile_data(database_data, prezentations_fields)
     else:
@@ -239,9 +237,9 @@ def create_ticket(send_mail=False):
 def get_conferencies():
     conferencies_fileds = ['id', 'capacity', 'description', 'address', 'genre', 'participants', 'begin_time',
                            'end_time', 'organizer', 'price']
-    database_data = data.send_request('''SELECT * FROM public."Conference"''')
-    if database_data[0]:
-        conferencies = parse_profile_data(database_data[1], conferencies_fileds)
+    result, database_data = data.send_request('''SELECT * FROM public."Conference"''')
+    if request:
+        conferencies = parse_profile_data(database_data, conferencies_fileds)
         ret = {"result": "Success", "conferencies": conferencies}
         return ret
     else:
