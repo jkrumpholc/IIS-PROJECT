@@ -66,15 +66,15 @@ export const User = (props) => {
   const PayTicket = (foo) => {
     console.log("Ticket to pay: " + foo);
     axios.post('/myPay', {
-
       id:foo
     })
     .then(function (response) {
+      console.log(response.data)
       if(response.data["result"]==="Success"){
         alert("Payed Ticket"); 
         window.location.reload(false);
       }else if (response.data["result"]==="Failure"){
-        alert("Failed to pay conference")
+        alert("Failed to pay for ticket")
       }
     })
     .catch(function (error) {
@@ -93,7 +93,7 @@ export const User = (props) => {
   );
   const listItems3 = Object.values(tick).map((item) =>
     <li>id: {item.id} | conference: {item.conference} | price: {item.price} | state: {item.status}
-    <button classname="Deletebtn" onClick={() => {DeleteTicket(item.id)}}>Delete</button> <button className="" onClick={() => {PayTicket(item.id)}}>Pay</button></li>
+    <button classname="Deletebtn" onClick={() => {DeleteTicket(item.id)}}>Delete</button> {item.status==="Reserved" && <button className="" onClick={() => {PayTicket(item.id)}}>Pay</button>}</li>
   );
         
   //console.log({id:props.user['id']});

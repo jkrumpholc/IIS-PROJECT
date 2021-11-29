@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 
 export const ManageConf = (props) => {
     const [tickets, setTickets] = useState([]);
+
     useEffect(() => {
         console.log(Object.keys(props.user).length!==0);
        
@@ -25,8 +26,48 @@ export const ManageConf = (props) => {
         }
       },[props.selected_konf, props.user])
 
+      const ConfirmTicket = (foo) => {
+        console.log("Ticket to confirm: " + foo);
+        axios.post('/myConfirm', {
+          toconfirm:"Ticket",
+          id:foo
+        })
+        .then(function (response) {
+          console.log(response.data)
+          if(response.data["result"]==="Success"){
+            alert("Confirmed Ticket"); 
+            window.location.reload(false);
+          }else if (response.data["result"]==="Failure"){
+            alert("Failed to pay for ticket")
+          }
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+      }
+      const DeleteTicket = (foo) => {
+        console.log("Ticket to delete: " + foo);
+        axios.post('/myDelete', {
+          todelete:"Ticket",
+          id:foo
+        })
+        .then(function (response) {
+          console.log(response.data)
+          if(response.data["result"]==="Success"){
+            alert("Payed Ticket"); 
+            window.location.reload(false);
+          }else if (response.data["result"]==="Failure"){
+            alert("Failed to pay for ticket")
+          }
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+      }
+
       const listItems = Object.values(tickets).map((item) =>
-        <li key={item.id}>Username: {item.owner} | Status: {item.status} </li>
+        <li key={item.id}>Username: {item.owner} | Status: {item.status} {item.status==="Reserved" ? 
+          <button onClick={() => {DeleteTicket(item.id)}}>Delete</button>:<button onClick={() => {ConfirmTicket(item.id)}}>Confirm</button>}</li>
     );
 
   return (
