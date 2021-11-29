@@ -63,6 +63,26 @@ export const User = (props) => {
     });
   }
 
+  const PayTicket = (foo) => {
+    console.log("Ticket to pay: " + foo);
+    axios.post('/myPay', {
+
+      id:foo
+    })
+    .then(function (response) {
+      if(response.data["result"]==="Success"){
+        alert("Payed Ticket"); 
+        window.location.reload(false);
+      }else if (response.data["result"]==="Failure"){
+        alert("Failed to pay conference")
+      }
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+  }
+
+
   const listItems1 = Object.values(Konf).map((item) =>
   <li onClick={() => {props.konfStateHandler(item)}}><Link to="/myConference">id: {item.id} | description: {item.description} |  from: {item.begin_time} | to: {item.end_time} | sold tickets: {item.participants}/{item.capacity} | date : {item.date} 
     </Link><button classname="Deletebtn" onClick={() => {DeleteConf(item.id)}}>Delete</button></li>
@@ -73,7 +93,7 @@ export const User = (props) => {
   );
   const listItems3 = Object.values(tick).map((item) =>
     <li>id: {item.id} | conference: {item.conference} | price: {item.price} | state: {item.status}
-    <button classname="Deletebtn" onClick={() => {DeleteTicket(item.id)}}>Delete</button></li>
+    <button classname="Deletebtn" onClick={() => {DeleteTicket(item.id)}}>Delete</button> <button className="" onClick={() => {PayTicket(item.id)}}>Pay</button></li>
   );
         
   //console.log({id:props.user['id']});
