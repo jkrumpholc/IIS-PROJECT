@@ -6,9 +6,7 @@ export const RoomSelect = ({isChecked,rooms , checkStateHandler,calcCapacity}) =
 
     useEffect(() => {
         calcCapacity();
-    }, [isChecked.room1,isChecked.room2,isChecked.room3]);
-
-
+    }, [isChecked.room1,isChecked.room2,isChecked.room3, calcCapacity]);
 
     return (
 
