@@ -10,7 +10,7 @@ export const Header = (props) => {
   const logoutUser = () =>{
     
     sessionStorage.clear();
-    console.log("sdasdad");
+    
   }
   const debug=()=>{
     console.log(props.user["result"]);
@@ -20,7 +20,7 @@ export const Header = (props) => {
   return (
         <header className="App-header" onClick={debug}>
         <div className="topnav">
-          <h2>Konference</h2>
+          <h2>Conference</h2>
           <div className="topnav-right">
 
 
@@ -28,8 +28,8 @@ export const Header = (props) => {
             <NavButton redirect="/" text="Home"/>
             {props.user["result"]!=="Success" && <NavButton redirect="/login" text="Sign In"/>}
             {props.user["result"]==="Success" && <NavButton  onClick={logoutUser} redirect="/login" text="Logout"/>}
-            <NavButton redirect="/konference" text="Konference"/>
-            <NavButton redirect="/user" text="Profile"/>
+            <NavButton redirect="/konference" text="Conference"/>
+            {props.user["result"]==="Success" && <NavButton redirect="/user" text="Profile"/>}
             
           </div>
         </div>

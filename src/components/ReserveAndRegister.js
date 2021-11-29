@@ -7,7 +7,7 @@ export const ReserveAndRegister = (props) => {
 
     const SubmitResAndReg = async e=> {
         e.preventDefault();
-        console.log(ticketDetails.quantity)
+        
 
         if(ticketDetails.quantity <=5 && ticketDetails.quantity >0){
         await axios.post('/addUser', {
@@ -40,7 +40,7 @@ export const ReserveAndRegister = (props) => {
 
     const SubmitRes = async e=> {
         e.preventDefault();
-        
+        console.log(ticketDetails.quantity)
         if(ticketDetails.quantity <=5 && ticketDetails.quantity >0){
         if(props.user['result']==='Success'){
             axios.post('/reserveTicket', {

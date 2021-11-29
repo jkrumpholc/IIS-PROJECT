@@ -46,16 +46,14 @@ export const Miestnosti = (props) => {
 
     <Link to="/clicked_konf"><li key={index} >{number}</li></Link>
     );*/
-  
-        const listItems = Object.values(Konf).map((item) =>
-        <Link to="/clicked_konf"><li onClick={() => {props.konfStateHandler(item)}}>Konference: {item.description} | Žánr: {item.genre} | Organizátor: {item.organizer} | prodané vstupenky: {item.participants}/{item.capacity} <br></br> Dátum: {item.date}, {item.begin_time} - {item.end_time}, Adresa: {item.address} </li></Link>
-        );
- 
-    
+    const listItems = Object.values(Konf).map((item) =>
+        <Link to="/clicked_konf"><li onClick={() => {props.konfStateHandler(item)}}>Conference: {item.description} | Genre: {item.genre} | Organizer: {item.organizer} | Sold Tickets: {item.participants}/{item.capacity} <br></br> Date: {item.date}, {item.begin_time} - {item.end_time}, Address: {item.address} </li></Link>
+    );
+
     return (
         <div className = "confWrapper">
         <div id="myDIV" className="header">
-            <h2>Konference</h2>
+            <h2>Conference</h2>
         <label for="myInput" style={{float:"left"}}>Search</label>  
         <input type="text" id="myInput" placeholder="Conference title..."/>
         {props.user["result"]==="Success"&& <span onClick={() =>{ setIsToggledAdd(!isToggledAdd );}} className="addBtn">Add</span>}
