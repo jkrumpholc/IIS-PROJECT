@@ -94,8 +94,7 @@ def register():
         ret = {"result": "Failure", "reason": "Username exists"}
         return json.dumps(ret)
     passwd_hash = (hashlib.md5(password.encode())).hexdigest()
-    if data.send_request(f'''INSERT INTO public."User"(username, name, surname, gender, password)  VALUES
-                     ('{username}', '{name}', '{surname}', '{gender}', '{passwd_hash}' )''', False):
+    if data.send_request(f'''INSERT INTO public."User"(username, name, surname, gender, password)  VALUES ('{username}', '{name}', '{surname}', '{gender}', '{passwd_hash}' )''', False):
         ret = {"result": "Success", "id": username}
         return json.dumps(ret)
 
@@ -238,11 +237,21 @@ def create_ticket(send_mail=False):
 @app.route('/availableConferences', methods=['GET', 'POST'])
 @cross_origin()
 def get_conferencies():
-    conferencies_fileds = ['id', 'capacity', 'description', 'address', 'genre', 'participants', 'begin_time',
-                           'end_time', 'organizer', 'price']
-    result, database_data = data.send_request('''SELECT * FROM public."Conference"''')
+    conferencies_fields = ['id', 'capacity', 'description', 'address', 'genre', 'participants', 'begin_time',
+                           'end_time', 'organizer', 'price', 'rooms']
+    result, database_data = data.send_request('''SELECT * FROM public."Conference" C ''')
     if result:
-        conferencies = parse_profile_data(database_data, conferencies_fileds)
+        conferencies = []
+        for i in database_data:
+            result, room_id = data.send_request(f'''SELECT id FROM public."Room" WHERE conferention = {i[0]}''')
+            if result:
+                room_id = [item for t in room_id for item in t]
+                i = list(i)
+                for n,j in enumerate(i):
+                    if type(j) == datetime.time:
+                        i[n] = datetime.time.strftime(j, "%H:%M")
+                i.append(room_id)
+                conferencies.append(dict(zip(conferencies_fields, i)))
         ret = {"result": "Success", "conferencies": conferencies}
         return ret
     else:
