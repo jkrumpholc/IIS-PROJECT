@@ -105,6 +105,7 @@ def create_conference():
     if request.method == 'GET' or request.method == 'POST':
         organizer = request.args.get('organizer') if request.method == 'GET' else request.json['organizer']
         description = request.args.get('description') if request.method == 'GET' else request.json['description']
+        date = request.args.get('date') if request.method =='GET' else request.json['date']
         genre = request.args.get('genre') if request.method == 'GET' else request.json['genre']
         address = request.args.get('address') if request.method == 'GET' else request.json['address']
         rooms = request.args.get('rooms') if request.method == 'GET' else request.json['rooms']
@@ -113,8 +114,8 @@ def create_conference():
         timeFrom = request.args.get('timeFrom') if request.method == 'GET' else request.json['timeFrom']
         price = request.args.get('price') if request.method == "GET" else request.json['price']
     else:
-        organizer = description = genre = address = rooms = capacity = timeTo = timeFrom = price = None
-    if None in (organizer, description, genre, address, rooms, capacity, timeTo, timeFrom, price):
+        organizer = description = date = genre = address = rooms = capacity = timeTo = timeFrom = price = None
+    if None in (organizer, description, date, genre, address, rooms, capacity, timeTo, timeFrom, price):
         ret = {"result": "Failure"}
         return json.dumps(ret)
     conference_id = data.send_request('''SELECT MAX(id) FROM public."Conference"''')[1][0][0]
@@ -122,7 +123,7 @@ def create_conference():
         conference_id = 0
     conference_id += 1
     if data.send_request(
-            f'''INSERT INTO public."Conference"(id,capacity,description,address,genre,organizer,begin_time,end_time,price) VALUES ({conference_id},{capacity},'{description}','{address}','{genre}','{organizer}','{timeFrom}','{timeTo}',{price}) ''',False):
+            f'''INSERT INTO public."Conference"(id,capacity,description,date,address,genre,organizer,begin_time,end_time,price) VALUES ({conference_id},{capacity},'{description}','{date}','{address}','{genre}','{organizer}','{timeFrom}','{timeTo}',{price}) ''',False):
         building = data.send_request(f'''SELECT id FROM public."Building" where name = '{address}' ''')[1][0][0]
         for i in rooms:
             if rooms[i]:
@@ -148,6 +149,8 @@ def parse_profile_data(temp_data, fields):
         for j, k in zip(i, fields):
             if type(j) == datetime.time:
                 j = datetime.time.strftime(j, "%H:%M")
+            elif type(j) == datetime.date:
+                j = datetime.date.strftime(j, "%Y-%m-%d")
             user_data[n][k] = j
     return user_data
 
@@ -170,9 +173,10 @@ def profile():
     else:
         ret = {"result": "Failure", "reason": "Cannot get tickets"}
         return json.dumps(ret)
-    conference_fields = ['id', 'capacity', 'description', 'address', 'participants', 'begin_time', 'end_time', 'price']
+    conference_fields = \
+        ['id', 'capacity', 'date', 'description', 'address', 'participants', 'begin_time', 'end_time', 'price']
     result, database_data = data.send_request(
-        f'''SELECT id,capacity,description,address,participants,begin_time,end_time, price FROM public."Conference" WHERE organizer = '{username}' ORDER BY id DESC ''')
+        f'''SELECT id,capacity,date,description,address,participants,begin_time,end_time, price FROM public."Conference" WHERE organizer = '{username}' ORDER BY id DESC ''')
     if result:
         user_conferencies = parse_profile_data(database_data, conference_fields)
     else:
@@ -197,25 +201,28 @@ def create_ticket(send_mail=False):
     if request.method == 'GET' or request.method == 'POST':
         try:
             username = request.args.get('username') if request.method == 'GET' else request.json['username']
-        except IndexError:
+        except KeyError:
             send_mail = True
-            mail = request.args.get('mail') if request.method == 'GET' else request.json['mail']
-        conference = request.args.get('conference') if request.method == 'GET' else request.json['conference']
+            email = request.args.get('email') if request.method == 'GET' else request.json['email']
+        conference = request.args.get('konf_id') if request.method == 'GET' else request.json['konf_id']
         quantity = request.args.get('quantity') if request.method == 'GET' else request.json['quantity']
     else:
         username = conference = quantity = None
     if None in (conference, quantity):
         ret = {"result": "Failure"}
         return json.dumps(ret)
-    ticket_id = (data.send_request(f'''SELECT MAX(id) FROM public."Ticket"''')[1][0][0]) + 1
+    result, ticket_id = data.send_request(f'''SELECT MAX(id) FROM public."Ticket"''')[1][0][0]
+    if ticket_id is None:
+        ticket_id = 0
+    ticket_id += 1
     price = (data.send_request(f'''SELECT price FROM public."Conference" where id={conference} ''')[1][0][0]) * quantity
     if send_mail:
-        result, database_data = data.send_request(f'''INSERT INTO public."User"(username) VALUES ('{mail}') ''')
+        result, database_data = data.send_request(f'''INSERT INTO public."User"(username) VALUES ('{email}') ''')
         if not result:
             ret = {"result": "Failure", "reason": database_data}
             return json.dumps(ret)
         if data.send_request(
-                f'''INSERT INTO public."Ticket" (id, price, conference, status, owner) VALUES ('{ticket_id}','{price}','{conference}','{"Reserved"}','{mail}')''',
+                f'''INSERT INTO public."Ticket" (id, price, conference, status, owner) VALUES ('{ticket_id}','{price}','{conference}','{"Reserved"}','{email}')''',
                 False):
             ret = {"result": "Success"}
             return json.dumps(ret)
@@ -238,7 +245,7 @@ def create_ticket(send_mail=False):
 @cross_origin()
 def get_conferencies():
     conferencies_fields = ['id', 'capacity', 'description', 'address', 'genre', 'participants', 'begin_time',
-                           'end_time', 'organizer', 'price', 'rooms']
+                           'end_time', 'organizer', 'price', 'date', 'rooms']
     room_fields = ['id', 'name']
     result, database_data = data.send_request('''SELECT * FROM public."Conference" C ''')
     if result:
@@ -252,6 +259,8 @@ def get_conferencies():
                 for n, j in enumerate(i):
                     if type(j) == datetime.time:
                         i[n] = datetime.time.strftime(j, "%H:%M")
+                    elif type(j) == datetime.date:
+                        i[n] = datetime.date.strftime(j, "%Y-%m-%d")
                 i.append(room_id)
                 conferencies.append(dict(zip(conferencies_fields, i)))
         ret = {"result": "Success", "conferencies": conferencies}
@@ -267,8 +276,8 @@ def create_prezentation():
     if request.method == 'GET' or request.method == 'POST':
         prezentaion = request.args.get('prezentation') if request.method == 'GET' else request.json['prezentation']
         room = request.args.get('room') if request.method == 'GET' else request.json['room']
-        start_time = request.args.get('') if request.method == 'GET' else request.json['']
-        end_time = request.args.get('') if request.method == 'GET' else request.json['']
+        start_time = request.args.get('timeFrom') if request.method == 'GET' else request.json['timeFrom']
+        end_time = request.args.get('timeTo') if request.method == 'GET' else request.json['timeTo']
         user = request.args.get('user') if request.method == 'GET' else request.json['user']
         conferencion = request.args.get('conferencion') if request.method == 'GET' else request.json['conferencion']
     else:
