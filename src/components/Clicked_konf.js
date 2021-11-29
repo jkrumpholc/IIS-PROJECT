@@ -1,16 +1,14 @@
-
 import './Header.css';
-import React, { useState, useEffect } from 'react';
-import {RegisterPresentation} from './RegisterPresentation';
+import React, { useState } from 'react';
 import {ReserveAndRegister} from './ReserveAndRegister';
 import { Link } from 'react-router-dom';
 
-export const Clicked_konf = (props) => {
+export const ClickedKonf = (props) => {
     const [isToggledRes, setisToggledRes] = useState(false);
 
-    useEffect(() => {
-        console.log(props.selected_konf.rooms)
-      }, []);
+    //useEffect(() => {
+    //    console.log(props.selected_konf.rooms)
+    //  }, []);
 
     const listItems = Object.values(props.selected_konf.rooms).map((item) =>
         <Link to="/clickedRooom"><li key={item.id} onClick={() => {props.roomStateHandler(item); console.log(item)}}>Room: {item.name} | Room id: {item.id} </li></Link>
@@ -33,6 +31,6 @@ export const Clicked_konf = (props) => {
     )
 }
 
-export default Clicked_konf
+export default ClickedKonf
 
  

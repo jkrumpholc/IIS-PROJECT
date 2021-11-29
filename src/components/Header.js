@@ -1,6 +1,4 @@
-
 import './Header.css';
-import { Button } from './Button';
 import NavButton from './NavButton';
 
 

@@ -1,4 +1,4 @@
-import React, { useState , useEffect } from 'react';
+import React, { useEffect } from 'react';
 import "./Miestnosti.css"
 
 export const RoomSelect = ({isChecked,rooms , checkStateHandler,calcCapacity}) => {

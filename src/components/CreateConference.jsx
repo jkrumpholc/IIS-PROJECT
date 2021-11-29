@@ -59,7 +59,8 @@ export const CreateConference = (props) => {
                     setRooms({ room1: "A1-0538",room2:"A1-0537",room3:"A1-0536"})
 
                     break;
-
+            default:
+                break;
         }
 
     }, [address]);

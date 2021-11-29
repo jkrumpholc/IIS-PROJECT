@@ -2,9 +2,8 @@
 import './Header.css';
 import React, { useState, useEffect } from 'react';
 import {RegisterPresentation} from './RegisterPresentation';
-import {ReserveAndRegister} from './ReserveAndRegister';
 
-export const Clicked_room = (props) => {
+export const ClickedRoom = (props) => {
     const [isToggledRegPres, setisToggledRegPres] = useState(false);
 
     useEffect(() => {
@@ -28,6 +27,6 @@ export const Clicked_room = (props) => {
     )
 }
 
-export default Clicked_room
+export default ClickedRoom
 
  

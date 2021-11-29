@@ -14,7 +14,7 @@ export const Miestnosti = (props) => {
         const getKonf = async () => {
            //  await fetchKonf();
             let KonfFromServ ;
-            const response = await axios.get(`/availableConferences`)
+            await axios.get(`/availableConferences`)
             .then(function (response) {
                 if (response.data["result"]==="Success"){
                      console.log("Success")
@@ -37,7 +37,7 @@ export const Miestnosti = (props) => {
 
         }
         getKonf();
-    }, [props.user]);
+    }, []);
 
 
     /*const numbers = [1, 2, 3, 4, 5];

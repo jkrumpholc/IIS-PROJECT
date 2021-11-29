@@ -32,7 +32,7 @@ export const RegisterPresentation = (props) => {
             formData.append('file', selectedFile);
       
 
-            let info;
+            //let info;
             axios.post('/registerPresentation', {
                 room_id: props.selectedRoom.id,
                 username: props.user['id'],

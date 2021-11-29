@@ -1,6 +1,6 @@
 
 import './Header.css';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 
 export const ManageConf = (props) => {
 
@@ -25,7 +25,7 @@ export const ManageConf = (props) => {
           });*/
           console.log("Getting presentations and tickets of conference with id:" + props.selected_konf.id)
         }
-      },[props.selected_konf])
+      },[props.selected_konf, props.user])
 
   return (
         <div>
