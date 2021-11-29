@@ -10,7 +10,7 @@ export const RegisterPresentation = (props) => {
 	const [isFilePicked, setIsFilePicked] = useState(false);
     const [presName, setPresName] = useState("");
     const [presTags, setPresTags] = useState("");
-
+    const [description, setDescription] =useState("");
     const changeHandler = (event) => {
         if(event.target.files[0]!==undefined){
             
@@ -30,7 +30,11 @@ export const RegisterPresentation = (props) => {
             console.log(selectedFile);
             const formData = new FormData();
             formData.append('file', selectedFile);
-            
+            console.log({timeFrom: timeFrom['timeFrom'],
+                timeTo: timeTo['timeTo'],
+                presName: presName['presName'],
+                presTags: presTags['presTags'],
+                description:description['description']})
             
             axios({
                 method: "post",
@@ -40,7 +44,7 @@ export const RegisterPresentation = (props) => {
                 timeTo: timeTo['timeTo'],
                 presName: presName['presName'],
                 presTags: presTags['presTags'],
-                
+                description:description['description'],
                 headers: { "Content-Type": "multipart/form-data" },
                 })
                 .then(function (response) {
@@ -72,6 +76,13 @@ export const RegisterPresentation = (props) => {
                 Title:
                 <br/>
                 <input onChange={e => setPresName({presName: e.target.value})}  type="text" name="name" required/>
+            </label>
+            <br/>
+
+            <label className="formLabels">
+                Description:
+                <br/>
+                <input  onChange={e=> setDescription({description: e.target.value})} type="text" name="description" required />
             </label>
             <br/>
 
@@ -111,7 +122,7 @@ export const RegisterPresentation = (props) => {
 			) 
 			}
 
-            <input type="file" name="file" onChange={changeHandler} />
+            <input type="file" name="file" onChange={changeHandler} required />
             </label>
             <input type="submit" value="Submit" />
         </form>
