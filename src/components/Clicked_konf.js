@@ -19,7 +19,7 @@ export const Clicked_konf = (props) => {
             {<span onClick={() =>{ setisToggledRes(!isToggledRes)}} className="addBtn">Reserve tickets</span>}
             {props.user["result"]==="Success"&& <span onClick={()=> {setisToggledRegPres(!isToggledRegPres);}} className="addBtn">Register presentation</span>}
             {isToggledRes&& <ReserveAndRegister selected_konf={props.selected_konf} user={props.user}/>}
-            {isToggledRegPres&& <RegisterPresentation selected_konf={props.selected_konf}/>}
+            {isToggledRegPres&& <RegisterPresentation user={props.user} selected_konf={props.selected_konf}/>}
         </div>
     )
 }

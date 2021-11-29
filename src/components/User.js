@@ -34,9 +34,13 @@ export const User = (props) => {
           })
           .then(function (response) {
             //console.log(response.data['tickets']);
+            if(response.data["result"]==="Success"){
             setKonf(response.data['conferencies'])
             setPres(response.data['prezentations'])
             setTick(response.data['tickets'])
+            }else if (response.data["result"]==="Failure"){
+             
+            }
             //console.log(Konf)
           })
           .catch(function (error) {

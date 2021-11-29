@@ -19,24 +19,24 @@ export const RegisterPresentation = (props) => {
 
     const handleSubmission = async e => {
         e.preventDefault();
-        console.log(props.selected_konf['begin_time']);
-        console.log(props.selected_konf['end_time']);
+
+
+
+        if (time['time']>=props.selected_konf['begin_time'] && time['time']<=props.selected_konf['end_time'] ){
+
+            const formData = new FormData();
+            formData.append('File', selectedFile);
+            console.log(props.user['id']);
             
+            
+            axios.post("/registerPresentation",{
+            conferenceID:props.selected_konf['id'],
+            presentationTime : time['time'],
+            data : formData
 
-        if (time['time']>=props.selected_konf['begin_time'] && time['time']<=props.selected_konf['end_time'] )
+            })
+        }else
             alert("Please select time in conference interval");
-
-        const formData = new FormData();
-        
-		formData.append('File', selectedFile);
-        console.log(props.selected_konf['id'])
-        /*
-        axios.post("/registerPresentation",{
-        
-        presentationTime : time['time'],
-        data : formData
-
-        })*/
 
 	};
 

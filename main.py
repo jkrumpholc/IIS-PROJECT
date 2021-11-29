@@ -243,7 +243,7 @@ def get_conferencies():
         ret = {"result": "Success", "conferencies": conferencies}
         return ret
     else:
-        ret = {"result": "Failure"}
+        ret = {"result": "Failure","reason":database_data}
         return ret
 
 

@@ -15,24 +15,42 @@ export const Miestnosti = (props) => {
         const getKonf = async () => {
             const KonfFromServ = await fetchKonf();
             console.log(KonfFromServ);
-            setKonf(KonfFromServ);
+            if(KonfFromServ!=="error" || KonfFromServ!==undefined )
+                setKonf(KonfFromServ);  
+            
+            
         }
         getKonf();
     }, [props.user]);
 
     const fetchKonf = async () => {
-        const response = await axios.get(`/availableConferences`);
-        return response.data['conferencies'];
+        const response = await axios.get(`/availableConferences`)
+        
+        .then(function (response) {
+            if (response.data["result"]==="Success")
+                return response.data['conferencies'];
+            else if (response.data["result"]==="Failure"){
+                alert("Failed to fetch "+response.data["reason"]);
+            return "error";
+            }
+          })
+        .catch(function (error) {
+            console.log(error);
+            alert("Server error");
+            return "error";
+        });
+       
     }
     /*const numbers = [1, 2, 3, 4, 5];
     const listItems = numbers.map((number,index) =>
 
     <Link to="/clicked_konf"><li key={index} >{number}</li></Link>
     );*/
-
-    const listItems = Object.values(Konf).map((item) =>
-    <Link to="/clicked_konf"><li onClick={() => {props.konfStateHandler(item)}}>id: {item.id} | popis: {item.description} |  od: {item.begin_time} | do: {item.end_time} | prodané vstupenky: {item.participants}/{item.capacity}</li></Link>
-    );
+  
+        const listItems = Object.values(Konf).map((item) =>
+        <Link to="/clicked_konf"><li onClick={() => {props.konfStateHandler(item)}}>id: {item.id} | popis: {item.description} |  od: {item.begin_time} | do: {item.end_time} | prodané vstupenky: {item.participants}/{item.capacity}</li></Link>
+        );
+ 
     
     return (
         <div className = "confWrapper">
