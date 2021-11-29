@@ -115,14 +115,26 @@ def create_conference():
     if None in (organizer, description, genre, address, rooms, capacity, timeTo, timeFrom, price):
         ret = {"result": "Failure"}
         return json.dumps(ret)
-    conference_id = (data.send_request('''SELECT MAX(id) FROM public."Conference"''')[1][0][0]) + 1
-    room_count = 0
-    room_list = ""
-    for i in rooms:
-        if rooms[i]:
-            room_count += 1
-            room_list += f'{i};'
-    if data.send_request(f'''INSERT INTO public."Conference"(id,capacity,description,address,genre,organizer,rooms,begin_time,end_time,price, room_list) VALUES ('{conference_id}','{capacity}','{description}','{address}','{genre}','{organizer}','{room_count}','{timeFrom}','{timeTo}','{price}','{room_list}') ''', False):
+    conference_id = data.send_request('''SELECT MAX(id) FROM public."Conference"''')[1][0][0]
+    if conference_id is None:
+        conference_id = 0
+    conference_id += 1
+    if data.send_request(
+            f'''INSERT INTO public."Conference"(id,capacity,description,address,genre,organizer,begin_time,end_time,price) VALUES ({conference_id},{capacity},'{description}','{address}','{genre}','{organizer}','{timeFrom}','{timeTo}',{price}) ''',False):
+        room_count = 0
+        room_list = ""
+        building = data.send_request(f'''SELECT id FROM public."Building" where name = '{address}' ''')[1][0][0]
+        for i in rooms:
+            if rooms[i]:
+                room_id = data.send_request('''SELECT MAX(id) FROM public."Room"''')[1][0][0]
+                if room_id is None:
+                    room_id = 0
+                room_id += 1
+                if data.send_request(f'''INSERT INTO public."Room"(id, name, building, conferention) VALUES ({room_id}, '{i}', {building}, {conference_id}) ''', False):
+                    continue
+                else:
+                    ret = {"result": "Failure"}
+                    return json.dumps(ret)
         ret = {"result": "Success", "id": conference_id}
         return ret
 
@@ -225,8 +237,8 @@ def create_ticket(send_mail=False):
 @app.route('/availableConferences', methods=['GET', 'POST'])
 @cross_origin()
 def get_conferencies():
-    conferencies_fileds = ['id', 'capacity', 'description', 'address', 'genre', 'participants', 'rooms', 'begin_time',
-                           'end_time', 'organizer', 'price', 'room_list']
+    conferencies_fileds = ['id', 'capacity', 'description', 'address', 'genre', 'participants', 'begin_time',
+                           'end_time', 'organizer', 'price']
     database_data = data.send_request('''SELECT * FROM public."Conference"''')
     if database_data[0]:
         conferencies = parse_profile_data(database_data[1], conferencies_fileds)
