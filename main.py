@@ -421,7 +421,15 @@ def pay():
         return json.dumps(ret)
     result = data.send_request(f'''UPDATE public."Ticket" SET status = 'Paid' WHERE id = {ticket_id}''', False)
     if result and type(result) == bool:
-        ret = {"result": "Success"}
+        result, database_data = data.send_request(f'''SELECT id, participants from public."Conference" C, "Ticket" T where T.id={ticket_id} AND C.id=T.conference''')
+        if result and type(result) == bool:
+            result, database_data = data.send_request(f'''UPDATE public."Conference" SET participants = {database_data[0][1] + 1} where id={database_data[0][0]}''')
+            if result and type(result) == bool:
+                ret = {"result": "Success"}
+            else:
+                ret = {"result": "Failure", "reason": "Cannot update data"}
+        else:
+            ret = {"result": "Failure", "reason": "Cannot update data"}
     else:
         ret = {"result": "Failure", "reason": "Cannot update data"}
     return json.dumps(ret)
