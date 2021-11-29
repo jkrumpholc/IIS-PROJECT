@@ -411,9 +411,9 @@ def send_conf_data():
     if id_ is None:
         ret = {"result": "Failure", "reason": "Data not provided"}
         return json.dumps(ret)
-    result, database_data = data.send_request(f'''SELECT id, owner from public."Ticket" where conference={id_} and (status='Reserved' or status='Paid')''')
+    result, database_data = data.send_request(f'''SELECT id, owner, status from public."Ticket" where conference={id_} and (status='Reserved' or status='Paid')''')
     if result and type(result) == bool:
-        tickets = parse_profile_data(database_data, ['id', 'name'])
+        tickets = parse_profile_data(database_data, ['id', 'owner', 'status'])
     else:
         ret = {"result": "Failure", "reason": "Cannot get tickets"}
         return json.dumps(ret)
