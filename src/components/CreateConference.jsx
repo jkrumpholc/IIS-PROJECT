@@ -34,6 +34,14 @@ export const CreateConference = (props) => {
         setCapacity(cislo)
     }
 
+    const disablePastDate = () => {
+        const today = new Date();
+        const dd = String(today.getDate() + 1).padStart(2, "0");
+        const mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
+        const yyyy = today.getFullYear();
+        return yyyy + "-" + mm + "-" + dd;
+    };
+
     useEffect(() => {
         setIsChecked({room1:false,room2:false,room3:false});
         setCapacity(0);
@@ -132,7 +140,7 @@ export const CreateConference = (props) => {
             </label>
             <br/>
             <label>Date<br></br>
-                <input type="date" onChange={e => setDate(e.target.value)} value={date}/>
+                <input type="date" onChange={e => setDate(e.target.value)} value={date} min={disablePastDate()}/>
             </label>
             <label className="formLabels" > Time From
             <br/>
