@@ -48,7 +48,7 @@ export const Miestnosti = (props) => {
     );*/
   
         const listItems = Object.values(Konf).map((item) =>
-        <Link to="/clicked_konf"><li onClick={() => {props.konfStateHandler(item)}}>Konference: {item.description} | Žánr: {item.genre} | Organizátor: {item.organizer} | prodané vstupenky: {item.participants}/{item.capacity} <br></br> Dátum: TODO, {item.begin_time} - {item.end_time}, Adresa: {item.address} </li></Link>
+        <Link to="/clicked_konf"><li onClick={() => {props.konfStateHandler(item)}}>Konference: {item.description} | Žánr: {item.genre} | Organizátor: {item.organizer} | prodané vstupenky: {item.participants}/{item.capacity} <br></br> Dátum: {item.date}, {item.begin_time} - {item.end_time}, Adresa: {item.address} </li></Link>
         );
  
     

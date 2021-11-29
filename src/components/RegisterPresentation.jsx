@@ -4,8 +4,8 @@ import axios from "axios";
 
 
 export const RegisterPresentation = (props) => {
-    const[time,setTime]=  useState("");
-
+    const [timeTo, setTimeTo] = useState("");
+    const [timeFrom, setTimeFrom] = useState("");
     const [selectedFile, setSelectedFile] = useState({name:"",type:"",size:"",lastModifiedDate:""});
 	const [isFilePicked, setIsFilePicked] = useState(false);
 
@@ -20,24 +20,39 @@ export const RegisterPresentation = (props) => {
     const handleSubmission = async e => {
         e.preventDefault();
 
-
-
-        if (time['time']>=props.selected_konf['begin_time'] && time['time']<=props.selected_konf['end_time'] ){
+        if ((timeFrom['timeFrom']>=props.selected_konf['begin_time'] && timeFrom['timeFrom']<=props.selected_konf['end_time'] ) &&
+        (timeTo['timeTo']>=props.selected_konf['begin_time'] && timeTo['timeTo']<=props.selected_konf['end_time'] ) ){
+           
+        
+        
 
             const formData = new FormData();
             formData.append('File', selectedFile);
             console.log(props.user['id']);
-            
-            
             axios.post("/registerPresentation",{
+                
             conferenceID:props.selected_konf['id'],
-            presentationTime : time['time'],
+            timeTo: timeTo["timeTo"],
+            timeFrom: timeFrom["timeFrom"],
             data : formData
 
-            })
-        }else
-            alert("Please select time in conference interval");
+            }).then(function (response) {
+            
+                if(response.data['result']==="Success"){
+                    alert("Success");
+                    console.log(response);
+                }
+                
+              })
+              .catch(function (error) {
+                alert("Failed:",error);
+                console.log(error);
+              });
 
+
+        }else{
+            alert("Please select time in conference interval");
+        }
 	};
 
     
@@ -52,11 +67,21 @@ export const RegisterPresentation = (props) => {
             </label>
             <br/>
 
-            <label className="formLabels" > Time
+            <label className="formLabels" > Time From
             <br/>
-                <input onChange={e => setTime({time: e.target.value}) } type="time" id="appt" name="appt"  required/>
+                <input onChange={e => setTimeFrom({timeFrom: e.target.value})} step="3600"  list="times" type="time" id="apptFrom" name="appt" required/>
 
             </label>
+
+            <label className="formLabels" > Time To
+            <br/>
+                <input onChange={e => setTimeTo({timeTo: e.target.value}) } step="3600" list="times" type="time" id="apptTo" name="appt" required/>
+
+            </label>
+
+
+
+
             <label   className="formLabels" > Select presentation
             {isFilePicked  && (
 				<div>

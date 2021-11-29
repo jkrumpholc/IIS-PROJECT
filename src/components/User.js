@@ -15,7 +15,7 @@ export const User = (props) => {
     );*/
 
   const listItems1 = Object.values(Konf).map((item) =>
-    <li>id: {item.id} | popis: {item.description} |  od: {item.begin_time} | do: {item.end_time} | prodané vstupenky: {item.participants}/{item.capacity}</li>
+    <li>id: {item.id} | popis: {item.description} |  od: {item.begin_time} | do: {item.end_time} | prodané vstupenky: {item.participants}/{item.capacity} | date : {item.date} </li>
   );
   const listItems2 = Object.values(pres).map((item) =>
     <li>id: {item.id} | názov prezentácie: {item.name} | konference: {item.conference_name} | od: {item.begin_time} | do: {item.end_time} | potvrzeno: {item.confirmed ? "Ano":"Ne"}</li>

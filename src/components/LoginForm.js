@@ -16,7 +16,7 @@ export default function LoginForm(props) {
       if(details.username === "" || details.password ==="") alert("Please fill in the login form")
       else{
         const response = await axios.post('/loginUser', {
-          username: details.username,
+          username: details.username, 
           password: details.password,
         });
         // set the state of the user
