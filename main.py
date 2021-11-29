@@ -453,6 +453,30 @@ def send_conf_data():
     return json.dumps(ret)
 
 
+@app.route('/myConfirm', methods=['GET', 'POST'])
+@cross_origin()
+def confirm():
+    if request.method == 'GET' or request.method == 'POST':
+        id_ = request.args.get('id') if request.method == 'GET' else request.json['id']
+        type_conf = request.args.get('toconfirm') if request.method == 'GET' else request.json['toconfirm']
+    else:
+        id_ = None
+        type_conf = None
+    if None in (id_, type_conf):
+        ret = {"result": "Failure", "reason": "Data not provided"}
+        return json.dumps(ret)
+    if type_conf == "Ticket":
+        result, database_data = data.send_request(f'''UPDATE public."Ticket" SET status = 'Confirmed' WHERE id={id_}''', False)
+    elif type_conf == "Presentation":
+        result, database_data = data.send_request(f'''UPDATE public."Presentation" SET confirmed = True WHERE id={id_}''', False)
+    if result and type(result) == bool:
+        ret = {"result": "Success"}
+    else:
+        ret = {"result": "Failure", "reason": "Cannot update data"}
+    return json.dumps(ret)
+
+
+
 @app.errorhandler(exceptions.InternalServerError)
 def handle_bad_request(e):
     print(e)
