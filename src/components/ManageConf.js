@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 
 export const ManageConf = (props) => {
     const [tickets, setTickets] = useState([]);
+    const [pres, setPres] = useState([]);
 
     useEffect(() => {
         console.log(Object.keys(props.user).length!==0);
@@ -13,8 +14,10 @@ export const ManageConf = (props) => {
             id: props.selected_konf.id
           })
           .then(function (response) {
+            console.log(response.data)
             if(response.data["result"]==="Success"){
               setTickets(response.data["tickets"])
+              setPres(response.data['presentations'])
             }else if (response.data["result"]==="Failure"){
               alert("Failed to load tickets")
             }
@@ -36,9 +39,28 @@ export const ManageConf = (props) => {
           console.log(response.data)
           if(response.data["result"]==="Success"){
             alert("Confirmed Ticket"); 
-            window.location.reload(false);
+            //window.location.reload(false);
           }else if (response.data["result"]==="Failure"){
             alert("Failed to pay for ticket")
+          }
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+      }
+      const ConfirmPres = (foo) => {
+        console.log("Ticket to confirm: " + foo);
+        axios.post('/myConfirm', {
+          toconfirm:"Presentation",
+          id:foo
+        })
+        .then(function (response) {
+          console.log(response.data)
+          if(response.data["result"]==="Success"){
+            alert("Confirmed Presentation"); 
+            //window.location.reload(false);
+          }else if (response.data["result"]==="Failure"){
+            alert("Failed to confirm pres")
           }
         })
         .catch(function (error) {
@@ -54,10 +76,27 @@ export const ManageConf = (props) => {
         .then(function (response) {
           console.log(response.data)
           if(response.data["result"]==="Success"){
-            alert("Payed Ticket"); 
-            window.location.reload(false);
+            alert("Deleted Ticket"); 
+            //window.location.reload(false);
           }else if (response.data["result"]==="Failure"){
             alert("Failed to pay for ticket")
+          }
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+      }
+      const DeletePres = (foo) => {
+        axios.post('/myDelete', {
+          todelete:"Presentation",
+          id:foo
+        })
+        .then(function (response) {
+          if(response.data["result"]==="Success"){
+            alert("Deleted presentation");
+            //window.location.reload(false);
+          }else if (response.data["result"]==="Failure"){
+            alert("Failed to delete conference")
           }
         })
         .catch(function (error) {
@@ -70,6 +109,11 @@ export const ManageConf = (props) => {
           <button onClick={() => {DeleteTicket(item.id)}}>Delete</button>:<button onClick={() => {ConfirmTicket(item.id)}}>Confirm</button>}</li>
     );
 
+    const listItems2 = Object.values(pres).map((item) =>
+    <li key={item.id}>Prezentace: {item.description} | Time: {item.begin_time} - {item.end_time}
+      <button onClick={() => {DeletePres(item.id)}}>Delete</button><button onClick={() => {ConfirmPres(item.id)}}>Confirm</button></li>
+);
+
   return (
         <div>
             <p><b>Building:</b> {props.selected_konf.address}</p>
@@ -80,6 +124,8 @@ export const ManageConf = (props) => {
             <p><b>From:</b> {props.selected_konf['begin_time']}<b> To: </b>{props.selected_konf['end_time'] }</p>
             <p><b>Konference tickets</b></p>
             <ul>{listItems}</ul>
+            <p><b>Konference presentations</b></p>
+            <ul>{listItems2}</ul>
         </div>
     )
 }
