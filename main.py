@@ -94,7 +94,8 @@ def register():
         ret = {"result": "Failure", "reason": "Username exists"}
         return json.dumps(ret)
     passwd_hash = (hashlib.md5(password.encode())).hexdigest()
-    if data.send_request(f'''INSERT INTO public."User"(username, name, surname, gender, password)  VALUES ('{username}', '{name}', '{surname}', '{gender}', '{passwd_hash}' )''', False):
+    result = data.send_request(f'''INSERT INTO public."User"(username, name, surname, gender, password)  VALUES ('{username}', '{name}', '{surname}', '{gender}', '{passwd_hash}' )''', False)
+    if result and len(result) == 1:
         ret = {"result": "Success", "id": username}
         return json.dumps(ret)
 
@@ -119,12 +120,12 @@ def create_conference():
         ret = {"result": "Failure"}
         return json.dumps(ret)
     date = datetime.datetime.strptime(date, "%Y-%m-%d")
-    conference_id = data.send_request('''SELECT MAX(id) FROM public."Conference"''')[1][0][0]
-    if conference_id is None:
+    result, conference_id = data.send_request('''SELECT MAX(id) FROM public."Conference"''')
+    if result and conference_id[0][0] is None:
         conference_id = 0
     conference_id += 1
-    if data.send_request(
-            f'''INSERT INTO public."Conference"(id,capacity,description,date,address,genre,organizer,begin_time,end_time,price) VALUES ({conference_id},{capacity},'{description}','{date}','{address}','{genre}','{organizer}','{timeFrom}','{timeTo}',{price}) ''',False):
+    result = data.send_request(f'''INSERT INTO public."Conference"(id,capacity,description,date,address,genre,organizer,begin_time,end_time,price) VALUES ({conference_id},{capacity},'{description}','{date}','{address}','{genre}','{organizer}','{timeFrom}','{timeTo}',{price}) ''',False)
+    if len(result) == 1 and result:
         building = data.send_request(f'''SELECT id FROM public."Building" where name = '{address}' ''')[1][0][0]
         for i in rooms:
             if rooms[i]:
@@ -143,8 +144,6 @@ def create_conference():
 
 def parse_profile_data(temp_data, fields):
     user_data = []
-    if len(temp_data) > 5:
-        temp_data = temp_data[:5]
     for n, i in enumerate(temp_data, 0):
         user_data.insert(n, {})
         for j, k in zip(i, fields):
@@ -183,16 +182,16 @@ def profile():
     else:
         ret = {"result": "Failure", "reason": "Cannot get conferencies"}
         return json.dumps(ret)
-    prezentations_fields = ['id', 'name', 'conference_name', 'room_name', 'begin_time', 'end_time', 'confirmed']
+    presentations_fields = ['id', 'name', 'conference_name', 'room_name', 'begin_time', 'end_time', 'confirmed']
     result, database_data = data.send_request(
         f'''SELECT P.id,P.name,C.description,R.name,P.begin_time,P.end_time,P.confirmed FROM public."Presentation" P, "Conference" C, "Room" R where conference=C.id and C.id=R.conferention and lecturer='{username}' ORDER BY id DESC ''')
     if result:
-        user_prezentations = parse_profile_data(database_data, prezentations_fields)
+        user_presentations = parse_profile_data(database_data, presentations_fields)
     else:
         ret = {"result": "Failure", "reason": "Cannot get presentations"}
         return json.dumps(ret)
     ret = {"result": "Success", "tickets": user_tickets, "conferencies": user_conferencies,
-           "prezentations": user_prezentations}
+           "prezentations": user_presentations}
     return json.dumps(ret)
 
 
@@ -222,16 +221,16 @@ def create_ticket(send_mail=False):
         if not result:
             ret = {"result": "Failure", "reason": database_data}
             return json.dumps(ret)
-        if data.send_request(
-                f'''INSERT INTO public."Ticket" (id, price, conference, status, owner) VALUES ('{ticket_id}','{price}','{conference}','{"Reserved"}','{email}')''',
-                False):
+        result = data.send_request(f'''INSERT INTO public."Ticket" (id, price, conference, status, owner) VALUES ('{ticket_id}','{price}','{conference}','{"Reserved"}','{email}')''', False)
+        if result and len(result) == 1:
             ret = {"result": "Success"}
             return json.dumps(ret)
     else:
         result, database_data = data.send_request(f'''SELECT * FROM public."User" where username = '{username}' ''')
         if result:
             if len(database_data) > 0:
-                if data.send_request(f'''INSERT INTO public."Ticket" (id, price, conference, status, owner) VALUES ('{ticket_id}','{price}','{conference}','{"Reserved"}','{username}')''', False):
+                result = data.send_request(f'''INSERT INTO public."Ticket" (id, price, conference, status, owner) VALUES ('{ticket_id}','{price}','{conference}','{"Reserved"}','{username}')''', False)
+                if result and len(result) == 1:
                     ret = {"result": "Success"}
                     return json.dumps(ret)
             else:
@@ -273,17 +272,17 @@ def get_conferencies():
 
 @app.route('/registerPresentation', methods=['GET', 'POST'])
 @cross_origin()
-def create_prezentation():
+def create_presentation():
     if request.method == 'GET' or request.method == 'POST':
-        prezentaion = request.args.get('prezentation') if request.method == 'GET' else request.json['prezentation']
+        presentaion = request.args.get('presentation') if request.method == 'GET' else request.json['presentation']
         room = request.args.get('room') if request.method == 'GET' else request.json['room']
         start_time = request.args.get('timeFrom') if request.method == 'GET' else request.json['timeFrom']
         end_time = request.args.get('timeTo') if request.method == 'GET' else request.json['timeTo']
         user = request.args.get('user') if request.method == 'GET' else request.json['user']
         conferencion = request.args.get('conferencion') if request.method == 'GET' else request.json['conferencion']
     else:
-        prezentaion = room = start_time = end_time = user = conferencion = None
-    if None in (prezentaion, room, start_time, end_time, user, conferencion):
+        presentaion = room = start_time = end_time = user = conferencion = None
+    if None in (presentaion, room, start_time, end_time, user, conferencion):
         ret = {"result": "Failure"}
         return json.dumps(ret)
     return {"result": "Success"}
