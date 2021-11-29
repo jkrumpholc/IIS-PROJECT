@@ -10,7 +10,6 @@ export const Admin = (props) => {
 
 
     const DeleteConf = (foo) => {
-        console.log("Conference to delete: " + foo);
         axios.post('/myDelete', {
           todelete:"Conference",
           id:foo
@@ -18,6 +17,7 @@ export const Admin = (props) => {
         .then(function (response) {
           if(response.data["result"]==="Success"){
             alert("Deleted conference");
+            window.location.reload(false);
           }else if (response.data["result"]==="Failure"){
             alert("Failed to delete conference")
           }
@@ -27,14 +27,14 @@ export const Admin = (props) => {
         });
       }
       const DeletePres = (foo) => {
-        console.log("Presentation to delete: " + foo);
         axios.post('/myDelete', {
           todelete:"Presentation",
           id:foo
         })
         .then(function (response) {
           if(response.data["result"]==="Success"){
-            alert("Deleted conference");
+            alert("Deleted presentation");
+            window.location.reload(false);
           }else if (response.data["result"]==="Failure"){
             alert("Failed to delete conference")
           }
@@ -44,14 +44,14 @@ export const Admin = (props) => {
         });
       }
       const DeleteTicket = (foo) => {
-        console.log("Ticket to delete: " + foo);
         axios.post('/myDelete', {
           todelete:"Ticket",
           id:foo
         })
         .then(function (response) {
           if(response.data["result"]==="Success"){
-            alert("Deleted conference");
+            alert("Deleted ticket");
+            window.location.reload(false);
           }else if (response.data["result"]==="Failure"){
             alert("Failed to delete conference")
           }
@@ -62,14 +62,14 @@ export const Admin = (props) => {
       }
 
       const DeleteUser = (foo) => {
-        console.log("Presentation to delete: " + foo);
         axios.post('/myDelete', {
           todelete:"User",
           id:foo
         })
         .then(function (response) {
           if(response.data["result"]==="Success"){
-            alert("Deleted conference");
+            alert("Deleted user");
+            window.location.reload(false);
           }else if (response.data["result"]==="Failure"){
             alert("Failed to delete conference")
           }
