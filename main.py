@@ -17,7 +17,7 @@ class Database:
             password="b889ddcdadd24f94e7e0f3aceecd92da372334e5663bb7795598250fb860634b",
             sslmode='require')
         self.cur = self.conn.cursor()
-    
+
     def send_request(self, sql, read=True):
         ret = None
         try:
@@ -238,13 +238,31 @@ def get_conferencies():
     conferencies_fileds = ['id', 'capacity', 'description', 'address', 'genre', 'participants', 'begin_time',
                            'end_time', 'organizer', 'price']
     result, database_data = data.send_request('''SELECT * FROM public."Conference"''')
-    if request:
+    if result:
         conferencies = parse_profile_data(database_data, conferencies_fileds)
         ret = {"result": "Success", "conferencies": conferencies}
         return ret
     else:
-        ret = {"result": "Failure","reason":database_data}
+        ret = {"result": "Failure", "reason": database_data}
         return ret
+
+
+@app.route('/registerPresentation', methods=['GET', 'POST'])
+@cross_origin()
+def create_prezentation():
+    if request.method == 'GET' or request.method == 'POST':
+        prezentaion = request.args.get('prezentation') if request.method == 'GET' else request.json['prezentation']
+        room = request.args.get('room') if request.method == 'GET' else request.json['room']
+        start_time = request.args.get('') if request.method == 'GET' else request.json['']
+        end_time = request.args.get('') if request.method == 'GET' else request.json['']
+        user = request.args.get('user') if request.method == 'GET' else request.json['user']
+        conferencion = request.args.get('conferencion') if request.method == 'GET' else request.json['conferencion']
+    else:
+        prezentaion = room = start_time = end_time = user = conferencion = None
+    if None in (prezentaion, room, start_time, end_time, user, conferencion):
+        ret = {"result": "Failure"}
+        return json.dumps(ret)
+    return {"result": "Success"}
 
 
 @app.errorhandler(exceptions.InternalServerError)

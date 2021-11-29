@@ -22,7 +22,7 @@ export default function LoginForm(props) {
       // set the state of the user
       props.stateHandler(response.data);
       console.log(response.data);
-        if(response.data['result']=="Success"){
+        if(response.data['result']==="Success"){
 
           sessionStorage.setItem("logged_user", JSON.stringify(response.data));
         }

@@ -13,34 +13,34 @@ export const Miestnosti = (props) => {
 
     useEffect(() => {
         const getKonf = async () => {
-            const KonfFromServ = await fetchKonf();
+           //  await fetchKonf();
+            let KonfFromServ ;
+            const response = await axios.get(`/availableConferences`)
+            .then(function (response) {
+                if (response.data["result"]==="Success"){
+                     console.log("Success")
+                     KonfFromServ = response.data["conferencies"]
+                }
+                else if (response.data["result"]==="Failure"){
+                    alert("Failed to fetch "+response.data["reason"]);
+                     KonfFromServ = "error";
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+                alert("Server error");
+                 KonfFromServ = "error";
+            });
+
             console.log(KonfFromServ);
-            if(KonfFromServ!=="error" || KonfFromServ!==undefined )
-                setKonf(KonfFromServ);  
-            
-            
+            if(KonfFromServ!=="error" && KonfFromServ!==undefined )
+                setKonf(KonfFromServ);
+
         }
         getKonf();
     }, [props.user]);
 
-    const fetchKonf = async () => {
-        const response = await axios.get(`/availableConferences`)
-        
-        .then(function (response) {
-            if (response.data["result"]==="Success")
-                return response.data['conferencies'];
-            else if (response.data["result"]==="Failure"){
-                alert("Failed to fetch "+response.data["reason"]);
-            return "error";
-            }
-          })
-        .catch(function (error) {
-            console.log(error);
-            alert("Server error");
-            return "error";
-        });
-       
-    }
+
     /*const numbers = [1, 2, 3, 4, 5];
     const listItems = numbers.map((number,index) =>
 
