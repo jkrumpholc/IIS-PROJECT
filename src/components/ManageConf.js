@@ -1,9 +1,9 @@
 import axios from "axios";
 import './Header.css';
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export const ManageConf = (props) => {
-
+    const [tickets, setTickets] = useState([]);
     useEffect(() => {
         console.log(Object.keys(props.user).length!==0);
        
@@ -12,11 +12,10 @@ export const ManageConf = (props) => {
             id: props.selected_konf.id
           })
           .then(function (response) {
-            //console.log(response.data['tickets']);
             if(response.data["result"]==="Success"){
-              console.log(response.data);
+              setTickets(response.data["tickets"])
             }else if (response.data["result"]==="Failure"){
-             
+              alert("Failed to load tickets")
             }
           })
           .catch(function (error) {
@@ -26,6 +25,10 @@ export const ManageConf = (props) => {
         }
       },[props.selected_konf, props.user])
 
+      const listItems = Object.values(tickets).map((item) =>
+        <li key={item.id}>Username: {item.owner} | Status: {item.status} </li>
+    );
+
   return (
         <div>
             <p><b>Building:</b> {props.selected_konf.address}</p>
@@ -34,6 +37,8 @@ export const ManageConf = (props) => {
             
             <p><b>Date:</b> {props.selected_konf.date}</p>
             <p><b>From:</b> {props.selected_konf['begin_time']}<b> To: </b>{props.selected_konf['end_time'] }</p>
+            <p><b>Konference tickets</b></p>
+            <ul>{listItems}</ul>
         </div>
     )
 }
