@@ -372,6 +372,25 @@ def create_presentation_file():
     return json.dumps(ret)
 
 
+@app.route('/myDelete', methods=['GET', 'POST'])
+@cross_origin()
+def delete():
+    if request.method == 'GET' or request.method == 'POST':
+        to_delete = request.args.get('todelete') if request.method == 'GET' else request.json['todelete']
+        id_ = request.args.get('id') if request.method == 'GET' else request.json['id']
+    else:
+        to_delete = id_ = None
+    if None in (to_delete, id_):
+        ret = {"result": "Failure"}
+        return json.dumps(ret)
+    result = data.send_request(f'''DELETE FROM public."{to_delete}" WHERE id = {id_}''', False)
+    if result and type(result) == bool:
+        ret = {"result": "Success"}
+    else:
+        ret = {"result": "Failure"}
+    return json.dumps(ret)
+
+
 @app.errorhandler(exceptions.InternalServerError)
 def handle_bad_request(e):
     print(e)
