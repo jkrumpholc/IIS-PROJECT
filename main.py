@@ -414,7 +414,7 @@ def pay():
     if ticket_id is None:
         ret = {"result": "Failure", "reason": "Data not provided"}
         return json.dumps(ret)
-    result = data.send_request(f'''UPDATE public."Ticket" SET status = 'Paid' WHERE id = {ticket_id}''')
+    result = data.send_request(f'''UPDATE public."Ticket" SET status = 'Paid' WHERE id = {ticket_id}''', False)
     if result and type(result) == bool:
         ret = {"result": "Success"}
     else:
