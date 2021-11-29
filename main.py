@@ -37,8 +37,7 @@ class Database:
             else:
                 ret = True
         finally:
-            if not read:
-                self.conn.commit()
+            self.conn.commit()
             return ret
 
 
@@ -95,8 +94,11 @@ def register():
         return json.dumps(ret)
     passwd_hash = (hashlib.md5(password.encode())).hexdigest()
     result = data.send_request(f'''INSERT INTO public."User"(username, name, surname, gender, password)  VALUES ('{username}', '{name}', '{surname}', '{gender}', '{passwd_hash}' )''', False)
-    if result and len(result) == 1:
+    if result and type(result) == bool:
         ret = {"result": "Success", "id": username}
+        return json.dumps(ret)
+    else:
+        ret = {"result": "Failure", "reason": str(result[1])}
         return json.dumps(ret)
 
 
@@ -106,7 +108,7 @@ def create_conference():
     if request.method == 'GET' or request.method == 'POST':
         organizer = request.args.get('organizer') if request.method == 'GET' else request.json['organizer']
         description = request.args.get('description') if request.method == 'GET' else request.json['description']
-        date = request.args.get('date') if request.method =='GET' else request.json['date']
+        date = request.args.get('date') if request.method == 'GET' else request.json['date']
         genre = request.args.get('genre') if request.method == 'GET' else request.json['genre']
         address = request.args.get('address') if request.method == 'GET' else request.json['address']
         rooms = request.args.get('rooms') if request.method == 'GET' else request.json['rooms']
@@ -125,7 +127,7 @@ def create_conference():
         conference_id = 0
     conference_id += 1
     result = data.send_request(f'''INSERT INTO public."Conference"(id,capacity,description,date,address,genre,organizer,begin_time,end_time,price) VALUES ({conference_id},{capacity},'{description}','{date}','{address}','{genre}','{organizer}','{timeFrom}','{timeTo}',{price}) ''',False)
-    if len(result) == 1 and result:
+    if result and type(result) == bool:
         building = data.send_request(f'''SELECT id FROM public."Building" where name = '{address}' ''')[1][0][0]
         for i in rooms:
             if rooms[i]:
@@ -139,7 +141,7 @@ def create_conference():
                     ret = {"result": "Failure"}
                     return json.dumps(ret)
         ret = {"result": "Success", "id": conference_id}
-        return ret
+        return json.dumps(ret)
 
 
 def parse_profile_data(temp_data, fields):
@@ -230,7 +232,7 @@ def create_ticket(send_mail=False):
         if result:
             if len(database_data) > 0:
                 result = data.send_request(f'''INSERT INTO public."Ticket" (id, price, conference, status, owner) VALUES ('{ticket_id}','{price}','{conference}','{"Reserved"}','{username}')''', False)
-                if result and len(result) == 1:
+                if result and type(result) == bool:
                     ret = {"result": "Success"}
                     return json.dumps(ret)
             else:
@@ -264,10 +266,10 @@ def get_conferencies():
                 i.append(room_id)
                 conferencies.append(dict(zip(conferencies_fields, i)))
         ret = {"result": "Success", "conferencies": conferencies}
-        return ret
+        return json.dumps(ret)
     else:
         ret = {"result": "Failure", "reason": database_data}
-        return ret
+        return json.dumps(ret)
 
 
 @app.route('/registerPresentation', methods=['GET', 'POST'])
