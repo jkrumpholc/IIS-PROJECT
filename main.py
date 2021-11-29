@@ -61,12 +61,15 @@ def login_user():
         return json.dumps(ret)
     result, database_data = data.send_request(f'''SELECT password from public."User" where username = '{username}' ''', True)
     if result:
-        data_pass = database_data[0][0]
-        passwd_hash = (hashlib.md5(password.encode())).hexdigest()
-        if data_pass == passwd_hash:
-            ret = {"result": "Success", "id": username}
+        if len(database_data) > 0:
+            data_pass = database_data[0][0]
+            passwd_hash = (hashlib.md5(password.encode())).hexdigest()
+            if data_pass == passwd_hash:
+                ret = {"result": "Success", "id": username}
+            else:
+                ret = {"result": "Failure", "reason": "Wrong password"}
         else:
-            ret = {"result": "Failure", "reason": "Wrong password"}
+            ret = {"result": "Failure", "reason": "Username not found"}
     else:
         ret = {"result": "Failure", "reason": database_data}
     return json.dumps(ret)
