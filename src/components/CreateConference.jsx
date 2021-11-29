@@ -173,7 +173,6 @@ export const CreateConference = (props) => {
                 <option value="19:00:00"/>
                 <option value="20:00:00"/>
                 <option value="21:00:00"/>
-                
             </datalist>
            
            

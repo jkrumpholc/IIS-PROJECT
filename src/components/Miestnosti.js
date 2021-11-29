@@ -18,7 +18,7 @@ export const Miestnosti = (props) => {
             setKonf(KonfFromServ);
         }
         getKonf();
-    }, []);
+    }, [props.user]);
 
     const fetchKonf = async () => {
         const response = await axios.get(`/availableConferences`);
