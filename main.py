@@ -125,7 +125,7 @@ def create_conference():
     result, conference_id = data.send_request('''SELECT MAX(id) FROM public."Conference"''')
     if result and conference_id[0][0] is None:
         conference_id = 0
-    conference_id += 1
+    conference_id = conference_id[0][0] + 1
     result = data.send_request(f'''INSERT INTO public."Conference"(id,capacity,description,date,address,genre,organizer,begin_time,end_time,price) VALUES ({conference_id},{capacity},'{description}','{date}','{address}','{genre}','{organizer}','{timeFrom}','{timeTo}',{price}) ''',False)
     if result and type(result) == bool:
         building = data.send_request(f'''SELECT id FROM public."Building" where name = '{address}' ''')[1][0][0]
