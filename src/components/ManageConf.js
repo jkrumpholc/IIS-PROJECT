@@ -1,4 +1,4 @@
-
+import axios from "axios";
 import './Header.css';
 import React, { useEffect } from 'react';
 
@@ -8,21 +8,20 @@ export const ManageConf = (props) => {
         console.log(Object.keys(props.user).length!==0);
        
        if (Object.keys(props.user).length!==0 && Object.keys(props.selected_konf).length!==0){
-        /*axios.post('/myConf', {
-            conf_id: props.selected_konf.id
+        axios.post('/myConf', {
+            id: props.selected_konf.id
           })
           .then(function (response) {
             //console.log(response.data['tickets']);
             if(response.data["result"]==="Success"){
-            
+              console.log(response.data);
             }else if (response.data["result"]==="Failure"){
              
             }
-            //console.log(Konf)
           })
           .catch(function (error) {
             console.log(error);
-          });*/
+          });
           console.log("Getting presentations and tickets of conference with id:" + props.selected_konf.id)
         }
       },[props.selected_konf, props.user])
