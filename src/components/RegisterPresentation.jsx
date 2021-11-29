@@ -32,7 +32,7 @@ export const RegisterPresentation = (props) => {
             formData.append('file', selectedFile);
       
 
-            
+            let info;
             axios.post('/registerPresentation', {
                 room_id: props.selectedRoom.id,
                 username: props.user['id'],
@@ -45,11 +45,15 @@ export const RegisterPresentation = (props) => {
               })
               .then(function (response) {
                 let info=response.data;
+                if (info['result']==="failure"){
+                    alert ("Request failed");
+                }
               })
               .catch(function (error) {
+                  alert ("Error");
                 console.log(error);
               });
-              
+
             if(info['result']==="Success"){
             axios({
                 method: "post",
