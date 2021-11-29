@@ -118,6 +118,7 @@ def create_conference():
     if None in (organizer, description, date, genre, address, rooms, capacity, timeTo, timeFrom, price):
         ret = {"result": "Failure"}
         return json.dumps(ret)
+    date = datetime.datetime.strptime(date, "%Y-%m-%d")
     conference_id = data.send_request('''SELECT MAX(id) FROM public."Conference"''')[1][0][0]
     if conference_id is None:
         conference_id = 0
@@ -211,11 +212,11 @@ def create_ticket(send_mail=False):
     if None in (conference, quantity):
         ret = {"result": "Failure"}
         return json.dumps(ret)
-    result, ticket_id = data.send_request(f'''SELECT MAX(id) FROM public."Ticket"''')[1][0][0]
-    if ticket_id is None:
+    result, ticket_id = data.send_request(f'''SELECT MAX(id) FROM public."Ticket"''')
+    if ticket_id[0][0] is None:
         ticket_id = 0
     ticket_id += 1
-    price = (data.send_request(f'''SELECT price FROM public."Conference" where id={conference} ''')[1][0][0]) * quantity
+    price = (data.send_request(f'''SELECT price FROM public."Conference" where id={conference} ''')[1][0][0]) * int(quantity)
     if send_mail:
         result, database_data = data.send_request(f'''INSERT INTO public."User"(username) VALUES ('{email}') ''')
         if not result:
@@ -229,7 +230,7 @@ def create_ticket(send_mail=False):
     else:
         result, database_data = data.send_request(f'''SELECT * FROM public."User" where username = '{username}' ''')
         if result:
-            if len(database_data) > 1:
+            if len(database_data) > 0:
                 if data.send_request(f'''INSERT INTO public."Ticket" (id, price, conference, status, owner) VALUES ('{ticket_id}','{price}','{conference}','{"Reserved"}','{username}')''', False):
                     ret = {"result": "Success"}
                     return json.dumps(ret)
