@@ -401,6 +401,33 @@ def delete():
     return json.dumps(ret)
 
 
+@app.route('/myConf', methods=['GET', 'POST'])
+@cross_origin()
+def send_conf_data():
+    if request.method == 'GET' or request.method == 'POST':
+        id_ = request.args.get('id') if request.method == 'GET' else request.json['id']
+    else:
+        id_ = None
+    if id_ is None:
+        ret = {"result": "Failure", "reason": "Data not provided"}
+        return json.dumps(ret)
+    result, database_data = data.send_request(f'''SELECT id, name from public."Ticket" where conference={id_} and (status='Reserved' or status='Paid')''')
+    if result and type(result) == bool:
+        tickets = parse_profile_data(database_data, ['id', 'name'])
+    else:
+        ret = {"result": "Failure", "reason": "Cannot get tickets"}
+        return json.dumps(ret)
+    result, database_data = data.send_request(f'''SELECT id, description, begin_time, end_time FROM public."Presentation" where conference={id_} and confirmed=FALSE''')
+    if result and type(result) == bool:
+        presentations = parse_profile_data(database_data, ['id', 'description', 'begin_time', 'end_time'])
+    else:
+        ret = {"result": "Failure", "reason": "Cannot get presentations"}
+        return json.dumps(ret)
+    ret = {"result": "Success", 'tickets': tickets, 'presentations': presentations}
+    return json.dumps(ret)
+
+
+
 @app.errorhandler(exceptions.InternalServerError)
 def handle_bad_request(e):
     print(e)
