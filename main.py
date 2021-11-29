@@ -404,6 +404,24 @@ def delete():
     return json.dumps(ret)
 
 
+@app.route('/myPay', methods=['GET', 'POST'])
+@cross_origin()
+def pay():
+    if request.method == 'GET' or request.method == 'POST':
+        ticket_id = request.args.get('id') if request.method == 'GET' else request.json['id']
+    else:
+        ticket_id = None
+    if ticket_id is None:
+        ret = {"result": "Failure", "reason": "Data not provided"}
+        return json.dumps(ret)
+    result = data.send_request(f'''UPDATE public."Ticket" SET status = 'Paid' WHERE id = {ticket_id}''')
+    if result and type(result) == bool:
+        ret = {"result": "Success"}
+    else:
+        ret = {"result": "Failure", "reason": "Cannot update data"}
+    return json.dumps(ret)
+
+
 @app.route('/myConf', methods=['GET', 'POST'])
 @cross_origin()
 def send_conf_data():
@@ -428,7 +446,6 @@ def send_conf_data():
         return json.dumps(ret)
     ret = {"result": "Success", 'tickets': tickets, 'presentations': presentations}
     return json.dumps(ret)
-
 
 
 @app.errorhandler(exceptions.InternalServerError)
