@@ -57,7 +57,7 @@ def login_user():
     else:
         username = password = None
     if None in (username, password):
-        ret = {"result": "Failure"}
+        ret = {"result": "Failure", "reason": "Data not provided"}
         return json.dumps(ret)
     result, database_data = data.send_request(f'''SELECT password from public."User" where username = '{username}' ''', True)
     if result:
@@ -87,7 +87,7 @@ def register():
     else:
         username = password = name = surname = gender = None
     if None in (username, password, name, surname, gender):
-        ret = {"result": "Failure"}
+        ret = {"result": "Failure", "reason": "Data not provided"}
         return json.dumps(ret)
     result, unique = data.send_request(f'''SELECT * FROM public."User" where username = {username} ''')
     if result and len(unique) > 1:
@@ -120,12 +120,12 @@ def create_conference():
     else:
         organizer = description = date = genre = address = rooms = capacity = timeTo = timeFrom = price = None
     if None in (organizer, description, date, genre, address, rooms, capacity, timeTo, timeFrom, price):
-        ret = {"result": "Failure"}
+        ret = {"result": "Failure", "reason": "Data not provided"}
         return json.dumps(ret)
     date = datetime.datetime.strptime(date, "%Y-%m-%d")
     result, conference_id = data.send_request('''SELECT MAX(id) FROM public."Conference"''')
     if not result:
-        ret = {"result": "Failure","reason": "Cannot get ConferenceID"}
+        ret = {"result": "Failure", "reason": "Cannot get ConferenceID"}
         return json.dumps(ret)
     if conference_id[0][0] is None:
         conference_id = 0
@@ -141,10 +141,12 @@ def create_conference():
                 if room_id is None:
                     room_id = 0
                 room_id += 1
-                if data.send_request(f'''INSERT INTO public."Room"(id, name, building, conferention) VALUES ({room_id}, '{i}', {building}, {conference_id}) ''', False):
+                result = data.send_request(
+                    f'''INSERT INTO public."Room"(id, name, building, conferention) VALUES ({room_id}, '{i}', {building}, {conference_id}) ''',False)
+                if result and type(result) == bool:
                     continue
                 else:
-                    ret = {"result": "Failure"}
+                    ret = {"result": "Failure", "reason": "Cannot insert into rooms"}
                     return json.dumps(ret)
         ret = {"result": "Success", "id": conference_id}
         return json.dumps(ret)
@@ -217,7 +219,7 @@ def create_ticket(send_mail=False):
     else:
         username = conference = quantity = None
     if None in (conference, quantity):
-        ret = {"result": "Failure"}
+        ret = {"result": "Failure", "reason": "Data not provided"}
         return json.dumps(ret)
     result, ticket_id = data.send_request(f'''SELECT MAX(id) FROM public."Ticket"''')
     if ticket_id[0][0] is None:
@@ -234,7 +236,6 @@ def create_ticket(send_mail=False):
         result = data.send_request(f'''INSERT INTO public."Ticket" (id, price, conference, status, owner) VALUES ('{ticket_id}','{price}','{conference}','{"Reserved"}','{email}')''', False)
         if result and len(result) == 1:
             ret = {"result": "Success"}
-            return json.dumps(ret)
     else:
         result, database_data = data.send_request(f'''SELECT * FROM public."User" where username = '{username}' ''')
         if result:
@@ -243,12 +244,13 @@ def create_ticket(send_mail=False):
                 if result and type(result) == bool:
                     ret = {"result": "Success"}
                     return json.dumps(ret)
+                else:
+                    ret = {"result": "Failure", "reason": result[1]}
             else:
                 ret = {"result": "Failure", "reason": "User not found"}
-                return json.dumps(ret)
         else:
             ret = {"result": "Failure", "reason": database_data}
-            return json.dumps(ret)
+    return json.dumps(ret)
 
 
 @app.route('/availableConferences', methods=['GET', 'POST'])
@@ -287,7 +289,7 @@ def get_admin():
     if result:
         conference_fields = ['id', 'capacity', 'description', 'address', 'genre', 'participants', 'begin_time',
                              'end_time', 'organizer', 'price', 'date']
-        conferencies = parse_profile_data(database_data,conference_fields)
+        conferencies = parse_profile_data(database_data, conference_fields)
     else:
         ret = {"result": "Failure", "reason": "Cannot get conferencies"}
         return json.dumps(ret)
@@ -296,7 +298,7 @@ def get_admin():
         user_fields = ['username', 'name', 'surname', 'gender', 'password', 'marked_prezentation']
         users = parse_profile_data(database_data, user_fields)
     else:
-        ret = {"result": "Failure"}
+        ret = {"result": "Failure", "reason": "Cannot get users"}
         return json.dumps(ret)
     result, database_data = data.send_request('''SELECT * FROM public."Presentation"''')
     if result:
@@ -334,7 +336,7 @@ def create_presentation():
     else:
         name = tags = description = room = start_time = end_time = user = conferencion = None
     if None in (name, tags, description, room, start_time, end_time, user, conferencion):
-        ret = {"result": "Failure"}
+        ret = {"result": "Failure", "reason": "Data not provided"}
         return json.dumps(ret)
     result, prezentation_id = data.send_request('''SELECT MAX(id) FROM public."Presentation"''')
     if result and type(result) == bool:
@@ -364,11 +366,12 @@ def create_presentation_file():
     if link_prezentation is not None:
         result = data.send_request(f'''UPDATE public."Presentation" SET data = '{file_data}' WHERE id = {link_prezentation}''', False)
         if result and type(result) == bool:
+            link_prezentation = None
             ret = {"result": "Success"}
         else:
-            ret = {"result": "Failure"}
+            ret = {"result": "Failure", "reason": result[1]}
     else:
-        ret = {"result": "Failure"}
+        ret = {"result": "Failure", "reason": "Lost linked prezentation"}
     return json.dumps(ret)
 
 
@@ -381,13 +384,13 @@ def delete():
     else:
         to_delete = id_ = None
     if None in (to_delete, id_):
-        ret = {"result": "Failure"}
+        ret = {"result": "Failure", "reason": "Data not provided"}
         return json.dumps(ret)
     result = data.send_request(f'''DELETE FROM public."{to_delete}" WHERE id = {id_}''', False)
     if result and type(result) == bool:
         ret = {"result": "Success"}
     else:
-        ret = {"result": "Failure"}
+        ret = {"result": "Failure", "reason": result[1]}
     return json.dumps(ret)
 
 
