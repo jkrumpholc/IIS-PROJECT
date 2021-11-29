@@ -8,13 +8,13 @@ import { Miestnosti } from './components/Miestnosti';
 import { User } from './components/User';
 import { Clicked_konf } from './components/Clicked_konf';
 import { Schedule } from './components/Schedule';
-
+import {Admin} from './components/Admin'
 
 function App() {
   
   const [user, setUser] = useState([])
   const [selected_konf, setSelected_konf] = useState([])
-    
+  const [admin, setAdmin] = useState(false)
   const stateHandler = (foo)=> {
     setUser(foo);
   }
@@ -27,9 +27,13 @@ function App() {
     
     
     if (loggedInUser) {
-      
+     
       const foundUser = loggedInUser;
+     
       setUser(foundUser);
+      if(user['id']==="OSBringer"){
+        setAdmin(true);
+      }
     }
   }, []);
  
@@ -47,7 +51,7 @@ function App() {
         <Route path="/user" element={<User user ={user}/>}/> 
         <Route path="/clicked_konf" element={<Clicked_konf selected_konf={selected_konf} user ={user}/>}/> 
         <Route path="/clicked_ticket" element={<Schedule user={user}/>}/> 
-
+        <Route path="/admin" element={ <Admin user={user}/>}/> 
       </Routes>
 
       

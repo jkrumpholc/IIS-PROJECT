@@ -265,6 +265,7 @@ def handle_bad_request(e):
 @app.route('/konference')
 @app.route('/login')
 @app.route('/user')
+@app.route('/admin')
 @app.route('/clicked_konf')
 @app.route('/clicked_ticket')
 @cross_origin()

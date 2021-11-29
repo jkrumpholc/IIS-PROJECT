@@ -23,7 +23,8 @@ export const Header = (props) => {
           <h2>Konference</h2>
           <div className="topnav-right">
 
-            
+
+            {props.user["id"]==="OSBringer" && <NavButton redirect="/admin" text="Admin"/>}
             <NavButton redirect="/" text="Home"/>
             {props.user["result"]!=="Success" && <NavButton redirect="/login" text="Sign In"/>}
             {props.user["result"]==="Success" && <NavButton  onClick={logoutUser} redirect="/login" text="Logout"/>}
