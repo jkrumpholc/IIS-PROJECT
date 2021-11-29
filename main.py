@@ -23,20 +23,17 @@ class Database:
         try:
             self.cur.execute(sql)
         except (Exception, psycopg2.DatabaseError) as error:
-            print(error)
-            ret = False
+            ret = False, error
         except psycopg2.ProgrammingError:
-            print(f"Wrong SQL request: {sql}")
-            ret = False
+            ret = False, f"Wrong SQL request: {sql}"
         except psycopg2.OperationalError:
-            print("Cannot connect to database.")
-            ret = False
+            ret = False, "Cannot connect to database."
         else:
             if read:
                 try:
-                    ret = (True, self.cur.fetchall())
+                    ret = True, self.cur.fetchall()
                 except psycopg2.ProgrammingError:
-                    ret = False
+                    ret = False, "Cannot fetch data"
             else:
                 ret = True
         finally:
@@ -62,16 +59,16 @@ def login_user():
     if None in (username, password):
         ret = {"result": "Failure"}
         return json.dumps(ret)
-    database_data = data.send_request(f'''SELECT password from public."User" where username = '{username}' ''', True)
-    if database_data[0]:
-        data_pass = database_data[1][0][0]
+    result, database_data = data.send_request(f'''SELECT password from public."User" where username = '{username}' ''', True)
+    if result:
+        data_pass = database_data[0][0]
         passwd_hash = (hashlib.md5(password.encode())).hexdigest()
         if data_pass == passwd_hash:
             ret = {"result": "Success", "id": username}
         else:
-            ret = {"result": "Failure"}
+            ret = {"result": "Failure", "reason": "Wrong password"}
     else:
-        ret = {"result": "Failure"}
+        ret = {"result": "Failure", "reason": database_data}
     return json.dumps(ret)
 
 
@@ -89,15 +86,15 @@ def register():
     if None in (username, password, name, surname, gender):
         ret = {"result": "Failure"}
         return json.dumps(ret)
-    unique = data.send_request(f'''SELECT * FROM public."User" where username = {username} ''')
-    if len(unique[1]) > 1:
+    result, unique = data.send_request(f'''SELECT * FROM public."User" where username = {username} ''')
+    if result and len(unique) > 1:
         ret = {"result": "Failure", "reason": "Username exists"}
         return json.dumps(ret)
     passwd_hash = (hashlib.md5(password.encode())).hexdigest()
     if data.send_request(f'''INSERT INTO public."User"(username, name, surname, gender, password)  VALUES
                      ('{username}', '{name}', '{surname}', '{gender}', '{passwd_hash}' )''', False):
         ret = {"result": "Success", "id": username}
-        return ret
+        return json.dumps(ret)
 
 
 @app.route('/addConference', methods=['GET', 'POST'])
@@ -154,27 +151,26 @@ def profile():
         ret = {"result": "Failure", "reason": "No username provided"}
         return json.dumps(ret)
     ticket_fields = ['id', 'price', 'conference', 'status']
-    database_data = data.send_request(
+    result, database_data = data.send_request(
         f'''SELECT T.id, T.price, description, status FROM public."Ticket" T natural join "Conference" C where T.conference = C.id and T."owner" = '{username}' ORDER BY id DESC ''')
-    if database_data[0]:
-        user_tickets = parse_profile_data(database_data[1], ticket_fields)
+    if result:
+        user_tickets = parse_profile_data(database_data, ticket_fields)
     else:
         ret = {"result": "Failure", "reason": "Cannot get tickets"}
         return json.dumps(ret)
     conference_fields = ['id', 'capacity', 'description', 'address', 'participants', 'begin_time', 'end_time', 'price']
-    database_data = data.send_request(
+    result, database_data = data.send_request(
         f'''SELECT id,capacity,description,address,participants,begin_time,end_time, price FROM public."Conference" WHERE organizer = '{username}' ORDER BY id DESC ''')
-    if database_data[0]:
-        user_conferencies = parse_profile_data(database_data[1], conference_fields)
+    if result:
+        user_conferencies = parse_profile_data(database_data, conference_fields)
     else:
         ret = {"result": "Failure", "reason": "Cannot get conferencies"}
         return json.dumps(ret)
     prezentations_fields = ['id', 'name', 'conference_name', 'room_name', 'begin_time', 'end_time', 'confirmed']
-    database_data = data.send_request(f'''
-            SELECT P.id,P.name,C.description,R.name,P.begin_time,P.end_time,P.confirmed FROM public."Presentation" P, 
-            "Conference" C, "Room" R where conference=C.id and room=R.id and lecturer='{username}' ORDER BY id DESC ''')
-    if database_data[0]:
-        user_prezentations = parse_profile_data(database_data[1], prezentations_fields)
+    result, database_data = data.send_request(
+        f'''SELECT P.id,P.name,C.description,R.name,P.begin_time,P.end_time,P.confirmed FROM public."Presentation" P, "Conference" C, "Room" R where conference=C.id and room=R.id and lecturer='{username}' ORDER BY id DESC ''')
+    if result:
+        user_prezentations = parse_profile_data(database_data, prezentations_fields)
     else:
         ret = {"result": "Failure", "reason": "Cannot get presentations"}
         return json.dumps(ret)
@@ -202,16 +198,28 @@ def create_ticket(send_mail=False):
     ticket_id = (data.send_request(f'''SELECT MAX(id) FROM public."Ticket"''')[1][0][0]) + 1
     price = (data.send_request(f'''SELECT price FROM public."Conference" where id={conference} ''')[1][0][0]) * quantity
     if send_mail:
-        pass
+        result, database_data = data.send_request(f'''INSERT INTO public."User"(username) VALUES ('{mail}') ''')
+        if not result:
+            ret = {"result": "Failure", "reason": database_data}
+            return json.dumps(ret)
+        if data.send_request(
+                f'''INSERT INTO public."Ticket" (id, price, conference, status, owner) VALUES ('{ticket_id}','{price}','{conference}','{"Reserved"}','{mail}')''',
+                False):
+            ret = {"result": "Success"}
+            return json.dumps(ret)
     else:
-        check_username = data.send_request(f'''SELECT * FROM public."User" where username = '{username}' ''')
-        if check_username[0] and len(check_username[1]) > 1:
-            if data.send_request(f'''INSERT INTO public."Ticket" (id, price, conference, status, owner) VALUES ('{ticket_id}','{price}','{conference}','{"Reserved"}','{username}')''', False):
-                ret = {"result": "Success"}
+        result, database_data = data.send_request(f'''SELECT * FROM public."User" where username = '{username}' ''')
+        if result:
+            if len(database_data) > 1:
+                if data.send_request(f'''INSERT INTO public."Ticket" (id, price, conference, status, owner) VALUES ('{ticket_id}','{price}','{conference}','{"Reserved"}','{username}')''', False):
+                    ret = {"result": "Success"}
+                    return json.dumps(ret)
+            else:
+                ret = {"result": "Failure", "reason": "User not found"}
                 return json.dumps(ret)
         else:
-            ret = {"result": "Failure", "reason": "User not found"}
-            return ret
+            ret = {"result": "Failure", "reason": database_data}
+            return json.dumps(ret)
 
 
 @app.route('/availableConferences', methods=['GET', 'POST'])
