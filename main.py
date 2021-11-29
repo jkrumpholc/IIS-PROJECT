@@ -239,15 +239,17 @@ def create_ticket(send_mail=False):
 def get_conferencies():
     conferencies_fields = ['id', 'capacity', 'description', 'address', 'genre', 'participants', 'begin_time',
                            'end_time', 'organizer', 'price', 'rooms']
+    room_fields = ['id', 'name']
     result, database_data = data.send_request('''SELECT * FROM public."Conference" C ''')
     if result:
         conferencies = []
         for i in database_data:
-            result, room_id = data.send_request(f'''SELECT id FROM public."Room" WHERE conferention = {i[0]}''')
+            result, room_id = data.send_request(f'''SELECT id, name FROM public."Room" WHERE conferention = {i[0]}''')
             if result:
-                room_id = [item for t in room_id for item in t]
+                for n in range(len(room_id)):
+                    room_id[n] = dict(zip(room_fields, room_id[n]))
                 i = list(i)
-                for n,j in enumerate(i):
+                for n, j in enumerate(i):
                     if type(j) == datetime.time:
                         i[n] = datetime.time.strftime(j, "%H:%M")
                 i.append(room_id)
