@@ -53,8 +53,7 @@ export const Miestnosti = (props) => {
         <div className = "confWrapper">
         <div id="myDIV" className="header">
             <h2>Conference</h2>
-        <label for="myInput" style={{float:"left"}}>Search</label>  
-        <input type="text" id="myInput" placeholder="Conference title..."/>
+       
         {props.user["result"]==="Success"&& <span onClick={() =>{ setIsToggledAdd(!isToggledAdd );}} className="addBtn">Add</span>}
         </div>
         {isToggledAdd&& <CreateConference user={props.user}/>}
