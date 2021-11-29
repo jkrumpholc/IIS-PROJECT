@@ -45,6 +45,7 @@ app = Flask(__name__, static_folder='build', static_url_path='')
 CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 data = Database()
+link_prezentation = None
 
 
 @app.route('/loginUser', methods=['GET', 'POST'])
@@ -123,9 +124,14 @@ def create_conference():
         return json.dumps(ret)
     date = datetime.datetime.strptime(date, "%Y-%m-%d")
     result, conference_id = data.send_request('''SELECT MAX(id) FROM public."Conference"''')
-    if result and conference_id[0][0] is None:
+    if not result:
+        ret = {"result": "Failure","reason": "Cannot get ConferenceID"}
+        return json.dumps(ret)
+    if conference_id[0][0] is None:
         conference_id = 0
-    conference_id = conference_id[0][0] + 1
+    else:
+        conference_id = conference_id[0][0]
+    conference_id += 1
     result = data.send_request(f'''INSERT INTO public."Conference"(id,capacity,description,date,address,genre,organizer,begin_time,end_time,price) VALUES ({conference_id},{capacity},'{description}','{date}','{address}','{genre}','{organizer}','{timeFrom}','{timeTo}',{price}) ''',False)
     if result and type(result) == bool:
         building = data.send_request(f'''SELECT id FROM public."Building" where name = '{address}' ''')[1][0][0]
@@ -186,7 +192,7 @@ def profile():
         return json.dumps(ret)
     presentations_fields = ['id', 'name', 'conference_name', 'room_name', 'begin_time', 'end_time', 'confirmed']
     result, database_data = data.send_request(
-        f'''SELECT P.id,P.name,C.description,R.name,P.begin_time,P.end_time,P.confirmed FROM public."Presentation" P, "Conference" C, "Room" R where conference=C.id and C.id=R.conferention and lecturer='{username}' ORDER BY id DESC ''')
+        f'''SELECT P.id,P.name,C.description,R.name,P.begin_time,P.end_time,P.confirmed FROM public."Presentation" P, "Conference" C, "Room" R where conference=C.id and room=R.id and lecturer='{username}' ORDER BY id DESC ''')
     if result:
         user_presentations = parse_profile_data(database_data, presentations_fields)
     else:
@@ -216,6 +222,8 @@ def create_ticket(send_mail=False):
     result, ticket_id = data.send_request(f'''SELECT MAX(id) FROM public."Ticket"''')
     if ticket_id[0][0] is None:
         ticket_id = 0
+    else:
+        ticket_id = ticket_id[0][0]
     ticket_id += 1
     price = (data.send_request(f'''SELECT price FROM public."Conference" where id={conference} ''')[1][0][0]) * int(quantity)
     if send_mail:
@@ -332,6 +340,8 @@ def create_presentation():
     if result and type(result) == bool:
         if prezentation_id[0][0] is None:
             prezentation_id = 0
+        else:
+            prezentation_id = prezentation_id[0][0]
     else:
         ret = {"result": "Failure", "reason": "Unvalid prezentationID"}
         return json.dumps(ret)
@@ -350,9 +360,9 @@ def create_presentation():
 def create_presentation_file():
     global link_prezentation
     file_data = request.files['file'].read()
-    file_data = file_data.decode("UTF-8")[1:]
+    file_data = file_data.decode("UTF-8")
     if link_prezentation is not None:
-        result = data.send_request(f'''UPDATE public."Presentation" SET data = {file_data} WHERE id = {link_prezentation}''')
+        result = data.send_request(f'''UPDATE public."Presentation" SET data = '{file_data}' WHERE id = {link_prezentation}''', False)
         if result and type(result) == bool:
             ret = {"result": "Success"}
         else:
