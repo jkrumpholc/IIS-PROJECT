@@ -12,6 +12,7 @@ export const CreateConference = (props) => {
     const [price, setPrice] =useState(0);
     const [description, setDescription] =useState("");
     const [genre, setGenre] =useState("");
+    const [date, setDate] =useState("");
     const [rooms, setRooms] = useState({room1:"",room2:"",room3:""});
     const [isChecked, setIsChecked] = useState({room1:false,room2:false,room3:false});
     const [capacity, setCapacity] = useState(0);
@@ -71,8 +72,19 @@ export const CreateConference = (props) => {
             '"'+rooms.room3+'":'+isChecked.room3+
             '}');
 
-       
-        axios.post('/addConference', {
+        /*const [timeTo, setTimeTo] = useState("");
+    const [timeFrom, setTimeFrom] = useState("");
+    const [address, setAddress] =useState("FIT");
+    const [price, setPrice] =useState(0);
+    const [description, setDescription] =useState("");
+    const [genre, setGenre] =useState("");
+    const [date, setDate] =useState("");
+    const [rooms, setRooms] = useState({room1:"",room2:"",room3:""});
+    const [isChecked, setIsChecked] = useState({room1:false,room2:false,room3:false});
+    const [capacity, setCapacity] = useState(0);*/
+        if(timeTo===""||timeFrom===""||price===0||description===""||genre===""||timeTo===""||capacity===0||date==="") alert("Fill in the whole form before registering")
+        else{
+            axios.post('/addConference', {
             organizer:props.user["id"],
             description:description['description'],
             address:address,
@@ -81,22 +93,23 @@ export const CreateConference = (props) => {
             capacity:capacity,
             price: price['price'],
             timeTo: timeTo["timeTo"],
-            timeFrom: timeFrom["timeFrom"]
-          })
-          .then(function (response) {
-            
-            if(response.data['result']==="Success"){
-                alert("Success");
-                console.log(response);
-            }
-            
-          })
-          .catch(function (error) {
-            alert("Failed:",error);
-            console.log(error);
-          });
-          
+            timeFrom: timeFrom["timeFrom"],
+            date: date
+            })
+            .then(function (response) {
+                
+                if(response.data['result']==="Success"){
+                    alert("Success");
+                    console.log(response);
+                }
+
+            })
+            .catch(function (error) {
+                alert("Failed:",error);
+                console.log(error);
+            });
         }
+    }
        
     }else alert("No room selected");
     }
@@ -118,7 +131,9 @@ export const CreateConference = (props) => {
                 <input onChange={e=> setGenre({genre: e.target.value})} type="textarea" name="genre" />
             </label>
             <br/>
-
+            <label>Date<br></br>
+                <input type="date" onChange={e => setDate(e.target.value)} value={date}/>
+            </label>
             <label className="formLabels" > Time From
             <br/>
                 <input onChange={e => setTimeFrom({timeFrom: e.target.value})} step="3600"  list="times" type="time" id="apptFrom" name="appt" required/>

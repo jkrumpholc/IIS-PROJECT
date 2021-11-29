@@ -37,7 +37,7 @@ export const ReserveAndRegister = (props) => {
         e.preventDefault();
         if(props.user['result']==='Success'){
             axios.post('/reserveTicket', {
-                user_id: props.user['id'],
+                username: props.user['id'],
                 konf_id: props.selected_konf['id'],
                 quantity: ticketDetails.quantity,
               })
