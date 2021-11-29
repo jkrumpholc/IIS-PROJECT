@@ -309,6 +309,7 @@ def handle_bad_request(e):
 @app.route('/admin')
 @app.route('/clicked_konf')
 @app.route('/clicked_ticket')
+@app.route('/myConference')
 @cross_origin()
 def serve():
     return send_from_directory(app.static_folder, 'index.html')
