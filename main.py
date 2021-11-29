@@ -125,7 +125,7 @@ def create_conference():
     result, conference_id = data.send_request('''SELECT MAX(id) FROM public."Conference"''')
     if result and conference_id[0][0] is None:
         conference_id = 0
-    conference_id += 1
+    conference_id = conference_id[0][0] + 1
     result = data.send_request(f'''INSERT INTO public."Conference"(id,capacity,description,date,address,genre,organizer,begin_time,end_time,price) VALUES ({conference_id},{capacity},'{description}','{date}','{address}','{genre}','{organizer}','{timeFrom}','{timeTo}',{price}) ''',False)
     if result and type(result) == bool:
         building = data.send_request(f'''SELECT id FROM public."Building" where name = '{address}' ''')[1][0][0]
@@ -270,6 +270,44 @@ def get_conferencies():
     else:
         ret = {"result": "Failure", "reason": database_data}
         return json.dumps(ret)
+
+
+@app.route('/getAdmin', methods=['GET', 'POST'])
+@cross_origin()
+def get_admin():
+    result, database_data = data.send_request('''SELECT * FROM public."Conference"''')
+    if result:
+        conference_fields = ['id', 'capacity', 'description', 'address', 'genre', 'participants', 'begin_time',
+                             'end_time', 'organizer', 'price', 'date']
+        conferencies = parse_profile_data(database_data,conference_fields)
+    else:
+        ret = {"result": "Failure", "reason": "Cannot get conferencies"}
+        return json.dumps(ret)
+    result, database_data = data.send_request('''SELECT * FROM public."User"''')
+    if result:
+        user_fields = ['username', 'name', 'surname', 'gender', 'password', 'marked_prezentation']
+        users = parse_profile_data(database_data, user_fields)
+    else:
+        ret = {"result": "Failure"}
+        return json.dumps(ret)
+    result, database_data = data.send_request('''SELECT * FROM public."Presentation"''')
+    if result:
+        presentation_field = ['id', 'name', 'description', 'tags', 'conference', 'begin_time', 'end_time', 'confirmed',
+                              'lecturer', 'data', 'room']
+        presentations = parse_profile_data(database_data, presentation_field)
+    else:
+        ret = {"result": "Failure", "reason": "Cannot get presentations"}
+        return json.dumps(ret)
+    result, database_data = data.send_request('''SELECT * FROM public."Ticket"''')
+    if result:
+        ticket_field = ['id', 'price', 'conference', 'status']
+        tickets = parse_profile_data(database_data, ticket_field)
+    else:
+        ret = {"result": "Failure", "reason": "Cannot get tickets"}
+        return json.dumps(ret)
+    ret = {"result": "Success", "users": users, "conferencies": conferencies,
+           "presentations": presentations, "tickets": tickets}
+    return ret
 
 
 @app.route('/registerPresentation', methods=['GET', 'POST'])
