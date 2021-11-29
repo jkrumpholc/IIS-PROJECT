@@ -45,6 +45,7 @@ export const RegisterPresentation = (props) => {
               })
               .then(function (response) {
                 let info=response.data;
+
                 if (info['result']==="failure"){
                     alert ("Request failed");
                 }
@@ -54,7 +55,7 @@ export const RegisterPresentation = (props) => {
                 console.log(error);
               });
 
-            if(info['result']==="Success"){
+           
             axios({
                 method: "post",
                 url: "/registerPresentationFile",
@@ -75,7 +76,7 @@ export const RegisterPresentation = (props) => {
                 console.log(error);
                 });
 
-            }
+            
                 
                 
 
