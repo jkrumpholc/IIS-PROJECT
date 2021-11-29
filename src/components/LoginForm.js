@@ -8,24 +8,27 @@ import { Register } from './Register';
 
 export default function LoginForm(props) {
     const [details, setDetails] = useState({username:"",email:"",password:""});
-    const [regdetails, setregDetails] = useState({username:"",password:"",name:"",surname:"",gender:"male"});
     const [isToggledReg, setIsToggledReg] = useState(false);
     const handleSubmit = async e => {
 
       e.preventDefault();
       //let user = [ details.username,details.password] ;
-      const response = await axios.post('/loginUser', {
-        username: details.username,
-        password: details.password,
-
-      });
-      // set the state of the user
-      props.stateHandler(response.data);
-      console.log(response.data);
-        if(response.data['result']==="Success"){
-
-          sessionStorage.setItem("logged_user", JSON.stringify(response.data));
-        }
+      if(details.username === "" || details.password ==="") alert("Please fill in the login form")
+      else{
+        const response = await axios.post('/loginUser', {
+          username: details.username,
+          password: details.password,
+        });
+        // set the state of the user
+        props.stateHandler(response.data);
+        console.log(response.data);
+          if(response.data['result']==="Success"){
+            sessionStorage.setItem("logged_user", JSON.stringify(response.data));
+          }
+          else{
+            alert("Failed to log in, wrong credentials")
+          }
+      }
     }
 
       
