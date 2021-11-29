@@ -177,7 +177,7 @@ def profile():
         return json.dumps(ret)
     ticket_fields = ['id', 'price', 'conference', 'status']
     result, database_data = data.send_request(
-        f'''SELECT T.id, T.price, description, status FROM public."Ticket" T natural join "Conference" C where T.conference = C.id and T."owner" = '{username}' ORDER BY id DESC ''')
+        f'''SELECT T.id, T.price, description, status FROM public."Ticket" T, "Conference" C where T.conference = C.id and T."owner" = '{username}' ORDER BY id DESC ''')
     if result:
         user_tickets = parse_profile_data(database_data, ticket_fields)
     else:
