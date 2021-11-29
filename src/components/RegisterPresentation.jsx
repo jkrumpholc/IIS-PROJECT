@@ -8,7 +8,8 @@ export const RegisterPresentation = (props) => {
     const [timeFrom, setTimeFrom] = useState("");
     const [selectedFile, setSelectedFile] = useState({name:"",type:"",size:"",lastModifiedDate:""});
 	const [isFilePicked, setIsFilePicked] = useState(false);
-
+    const [presName, setPresName] = useState("");
+    const [presTags, setPresTags] = useState("");
 
     const changeHandler = (event) => {
         if(event.target.files[0]!==undefined){
@@ -30,10 +31,16 @@ export const RegisterPresentation = (props) => {
             const formData = new FormData();
             formData.append('file', selectedFile);
             
+            
             axios({
                 method: "post",
                 url: "/registerPresentation",
                 data: formData,
+                timeFrom: timeFrom['timeFrom'],
+                timeTo: timeTo['timeTo'],
+                presName: presName['presName'],
+                presTags: presTags['presTags'],
+                
                 headers: { "Content-Type": "multipart/form-data" },
                 })
                 .then(function (response) {
@@ -48,7 +55,7 @@ export const RegisterPresentation = (props) => {
                 alert("Failed:",error);
                 console.log(error);
                 });
-            
+                
          
 
         }else{
@@ -64,7 +71,14 @@ export const RegisterPresentation = (props) => {
             <label className="formLabels">
                 Title:
                 <br/>
-                <input type="text" name="name" />
+                <input onChange={e => setPresName({presName: e.target.value})}  type="text" name="name" required/>
+            </label>
+            <br/>
+
+            <label className="formLabels">
+                Tags:
+                <br/>
+                <input onChange={e => setPresTags({presTags: e.target.value})} type="text" name="name" required/>
             </label>
             <br/>
 
