@@ -108,20 +108,20 @@ export const Admin = (props) => {
       
        const listItems1 = Object.values(konf).map((item) =>
        <li onClick={() => {props.konfStateHandler(item)}}>id: {item.id} | description: {item.description} |  from: {item.begin_time} | to: {item.end_time} | sold tickets: {item.participants}/{item.capacity} | date : {item.date} 
-       <button classname="Deletebtn" onClick={() => {DeleteConf(item.id)}}>Delete</button></li>
+       <button className="Deletebtn" onClick={() => {DeleteConf(item.id)}}>Delete</button></li>
        );
        
 
        const listItems2 = Object.values(users).map((item) =>
          <li>username: {item.username} | marked_presentation: {item.marked_prezentation} | name: {item.name} | surname: {item.surname} | gender: {item.gender}
-         <button classname="Deletebtn" onClick={() => {DeleteUser(item.username)}}>Delete</button></li>
+         <button className="Deletebtn" onClick={() => {DeleteUser(item.username)}}>Delete</button></li>
          
        );
      
    
        const listItems3 = Object.values(tick).map((item) =>
          <li>id: {item.id} | conference: {item.conference} | price: {item.price} | state: {item.status}
-         <button classname="Deletebtn" onClick={() => {DeleteTicket(item.id)}}>Delete</button></li>
+         <button className="Deletebtn" onClick={() => {DeleteTicket(item.id)}}>Delete</button></li>
          
        );
        
@@ -129,7 +129,7 @@ export const Admin = (props) => {
     
        const listItems4 = Object.values(pres).map((item) =>
        <li>id: {item.id} | presentation description: {item.name} | conference: {item.conference_name} | from: {item.begin_time} | to: {item.end_time} | confirmed: {item.confirmed ? "Yes":"No"}
-         <button classname="Deletebtn" onClick={() => {DeletePres(item.id)}}>Delete</button></li>
+         <button className="Deletebtn" onClick={() => {DeletePres(item.id)}}>Delete</button></li>
         );
       
 

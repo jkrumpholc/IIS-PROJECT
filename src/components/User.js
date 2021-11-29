@@ -16,7 +16,8 @@ export const User = (props) => {
     })
     .then(function (response) {
       if(response.data["result"]==="Success"){
-        alert("Deleted conference");
+        alert("Deleted conference"); 
+        window.location.reload(false);
       }else if (response.data["result"]==="Failure"){
         alert("Failed to delete conference")
       }
@@ -33,7 +34,8 @@ export const User = (props) => {
     })
     .then(function (response) {
       if(response.data["result"]==="Success"){
-        alert("Deleted conference");
+        alert("Deleted presentation");
+        window.location.reload(false);
       }else if (response.data["result"]==="Failure"){
         alert("Failed to delete conference")
       }
@@ -50,7 +52,8 @@ export const User = (props) => {
     })
     .then(function (response) {
       if(response.data["result"]==="Success"){
-        alert("Deleted conference");
+        alert("Deleted Ticket"); 
+        window.location.reload(false);
       }else if (response.data["result"]==="Failure"){
         alert("Failed to delete conference")
       }
