@@ -1,6 +1,7 @@
 import React, {Component, useState , useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from "axios";
+import './Miestnosti.css';
 
 
 export const User = (props) => {
