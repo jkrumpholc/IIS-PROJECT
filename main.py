@@ -313,19 +313,53 @@ def get_admin():
 @app.route('/registerPresentation', methods=['GET', 'POST'])
 @cross_origin()
 def create_presentation():
+    global link_prezentation
     if request.method == 'GET' or request.method == 'POST':
-        presentaion = request.args.get('presentation') if request.method == 'GET' else request.json['presentation']
-        room = request.args.get('room') if request.method == 'GET' else request.json['room']
+        name = request.args.get('presName') if request.method == 'GET' else request.json['presName']
+        tags = request.args.get('presTags') if request.method == 'GET' else request.json['presTags']
+        description = request.args.get('description') if request.method == 'GET' else request.json['description']
+        room = request.args.get('room_id') if request.method == 'GET' else request.json['room_id']
         start_time = request.args.get('timeFrom') if request.method == 'GET' else request.json['timeFrom']
         end_time = request.args.get('timeTo') if request.method == 'GET' else request.json['timeTo']
-        user = request.args.get('user') if request.method == 'GET' else request.json['user']
-        conferencion = request.args.get('conferencion') if request.method == 'GET' else request.json['conferencion']
+        user = request.args.get('username') if request.method == 'GET' else request.json['username']
+        conferencion = request.args.get('conf_id') if request.method == 'GET' else request.json['conf_id']
     else:
-        presentaion = room = start_time = end_time = user = conferencion = None
-    if None in (presentaion, room, start_time, end_time, user, conferencion):
+        name = tags = description = room = start_time = end_time = user = conferencion = None
+    if None in (name, tags, description, room, start_time, end_time, user, conferencion):
         ret = {"result": "Failure"}
         return json.dumps(ret)
-    return {"result": "Success"}
+    result, prezentation_id = data.send_request('''SELECT MAX(id) FROM public."Presentation"''')
+    if result and type(result) == bool:
+        if prezentation_id[0][0] is None:
+            prezentation_id = 0
+    else:
+        ret = {"result": "Failure", "reason": "Unvalid prezentationID"}
+        return json.dumps(ret)
+    prezentation_id += 1
+    result = data.send_request(f'''INSERT INTO public."Presentation"(id, name, description, tags, conference, begin_time, end_time, confirmed, lecturer,room) VALUES ({prezentation_id},'{name}','{description}','{tags}',{conferencion},'{start_time}','{end_time}',FALSE,'{user}',{room})''', False)
+    if result and type(result) == bool:
+        ret = {"result": "Success"}
+        link_prezentation = prezentation_id
+    else:
+        ret = {"result": "Failure", "reason": "Failed insert of prezentation"}
+    return json.dumps(ret)
+
+
+@app.route('/registerPresentationFile', methods=['GET', 'POST'])
+@cross_origin()
+def create_presentation_file():
+    global link_prezentation
+    file_data = request.files['file'].read()
+    file_data = file_data.decode("UTF-8")[1:]
+    if link_prezentation is not None:
+        result = data.send_request(f'''UPDATE public."Presentation" SET data = {file_data} WHERE id = {link_prezentation}''')
+        if result and type(result) == bool:
+            ret = {"result": "Success"}
+        else:
+            ret = {"result": "Failure"}
+    else:
+        ret = {"result": "Failure"}
+    return json.dumps(ret)
 
 
 @app.errorhandler(exceptions.InternalServerError)
