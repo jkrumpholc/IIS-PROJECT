@@ -23,7 +23,7 @@ export const Clicked_room = (props) => {
             <p><b>Selected room:</b> {props.selectedRoom.name} </p>
            
             {props.user["result"]==="Success"&& <span onClick={()=> {setisToggledRegPres(!isToggledRegPres);}} className="addBtn">Register presentation</span>}
-            {isToggledRegPres&& <RegisterPresentation user={props.user} selected_konf={props.selected_konf}/>}
+            {isToggledRegPres&& <RegisterPresentation user={props.user} selectedRoom={props.selectedRoom} selected_konf={props.selected_konf}/>}
         </div>
     )
 }

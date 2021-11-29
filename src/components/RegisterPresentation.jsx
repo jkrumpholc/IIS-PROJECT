@@ -30,15 +30,24 @@ export const RegisterPresentation = (props) => {
             console.log(selectedFile);
             const formData = new FormData();
             formData.append('file', selectedFile);
-            console.log({timeFrom: timeFrom['timeFrom'],
-                timeTo: timeTo['timeTo'],
-                presName: presName['presName'],
-                presTags: presTags['presTags'],
-                description:description['description']})
+            /*console.log({
+            room_id: props.selectedRoom.id,
+            username: props.user['id'],
+            conf_id: props.selected_konf.id,
+            data: formData,
+            timeFrom: timeFrom['timeFrom'],
+            timeTo: timeTo['timeTo'],
+            presName: presName['presName'],
+            presTags: presTags['presTags'],
+            description:description['description'],
+            headers: { "Content-Type": "multipart/form-data" }})*/
             
             axios({
                 method: "post",
                 url: "/registerPresentation",
+                room_id: props.selectedRoom.id,
+                username: props.user['id'],
+                conf_id: props.selected_konf.id,
                 data: formData,
                 timeFrom: timeFrom['timeFrom'],
                 timeTo: timeTo['timeTo'],
