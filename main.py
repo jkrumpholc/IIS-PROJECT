@@ -132,6 +132,11 @@ def create_conference():
     else:
         conference_id = conference_id[0][0]
     conference_id += 1
+    result, collizion_check = data.send_request(f'''SELECT * FROM public."Conference" where date = '{date}' and ((begin_time <= '{timeFrom}' and end_time >= '{timeFrom}') or (begin_time <= '{timeTo}' and end_time >='{timeTo}'))''')
+    if result and type(result) == bool:
+        if len(collizion_check) > 0:
+            ret = {"result": "Failure", "reason": "Collizion"}
+            return json.dumps(ret)
     result = data.send_request(f'''INSERT INTO public."Conference"(id,capacity,description,date,address,genre,organizer,begin_time,end_time,price) VALUES ({conference_id},{capacity},'{description}','{date}','{address}','{genre}','{organizer}','{timeFrom}','{timeTo}',{price}) ''',False)
     if result and type(result) == bool:
         building = data.send_request(f'''SELECT id FROM public."Building" where name = '{address}' ''')[1][0][0]
