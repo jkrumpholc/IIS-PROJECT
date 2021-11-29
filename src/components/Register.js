@@ -5,8 +5,9 @@ export const Register = () => {
 
     const handleregSubmit = async e=> {
         e.preventDefault();
-
-        axios.post('/addUser', {
+        if(regdetails.username === "" ||regdetails.password === "" ||regdetails.name === "" ||regdetails.surname === "") alert ("Please fill in the register form");
+        else{
+          axios.post('/addUser', {
             username: regdetails.username,
             password: regdetails.password,
             name:   regdetails.name,
@@ -14,13 +15,14 @@ export const Register = () => {
             gender: regdetails.gender,
           })
           .then(function (response) {
-            console.log(response);
+            if(response.data['result']) alert("Successful registration, you can now log in");
+            else alert("Registration unsuccessful");
           })
           .catch(function (error) {
             console.log(error);
           });
-        
         }
+    }
     return (
         
         <div>
