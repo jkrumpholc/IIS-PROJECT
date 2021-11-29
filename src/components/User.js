@@ -8,24 +8,72 @@ export const User = (props) => {
   const [Konf, setKonf] = useState([]);
   const [pres, setPres] = useState([]);
   const [tick, setTick] = useState([]);
-  const numbers = [1, 2, 3, 4, 5];
-  /*const listItems = numbers.map((number,index) =>
-
-    <Link to="/clicked_ticket"><li key={index} >{number}</li></Link>
-    );*/
+  const DeleteConf = (foo) => {
+    console.log("Conference to delete: " + foo);
+    axios.post('/myDelete', {
+      todelete:"Conference",
+      id:foo
+    })
+    .then(function (response) {
+      if(response.data["result"]==="Success"){
+        alert("Deleted conference");
+      }else if (response.data["result"]==="Failure"){
+        alert("Failed to delete conference")
+      }
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+  }
+  const DeletePres = (foo) => {
+    console.log("Presentation to delete: " + foo);
+    axios.post('/myDelete', {
+      todelete:"Presentation",
+      id:foo
+    })
+    .then(function (response) {
+      if(response.data["result"]==="Success"){
+        alert("Deleted conference");
+      }else if (response.data["result"]==="Failure"){
+        alert("Failed to delete conference")
+      }
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+  }
+  const DeleteTicket = (foo) => {
+    console.log("Ticket to delete: " + foo);
+    axios.post('/myDelete', {
+      todelete:"Ticket",
+      id:foo
+    })
+    .then(function (response) {
+      if(response.data["result"]==="Success"){
+        alert("Deleted conference");
+      }else if (response.data["result"]==="Failure"){
+        alert("Failed to delete conference")
+      }
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+  }
 
   const listItems1 = Object.values(Konf).map((item) =>
-    
-  <Link to="/myConference"><li onClick={() => {props.konfStateHandler(item)}}>id: {item.id} | description: {item.description} |  from: {item.begin_time} | to: {item.end_time} | sold tickets: {item.participants}/{item.capacity} | date : {item.date} </li></Link>
+  <li onClick={() => {props.konfStateHandler(item)}}><Link to="/myConference">id: {item.id} | description: {item.description} |  from: {item.begin_time} | to: {item.end_time} | sold tickets: {item.participants}/{item.capacity} | date : {item.date} 
+    </Link><button classname="Deletebtn" onClick={() => {DeleteConf(item.id)}}>Delete</button></li>
   );
   const listItems2 = Object.values(pres).map((item) =>
-    <li>id: {item.id} | presentation description: {item.name} | conference: {item.conference_name} | from: {item.begin_time} | to: {item.end_time} | confirmed: {item.confirmed ? "Yes":"No"}</li>
+    <li>id: {item.id} | presentation description: {item.name} | conference: {item.conference_name} | from: {item.begin_time} | to: {item.end_time} | confirmed: {item.confirmed ? "Yes":"No"}
+      <button classname="Deletebtn" onClick={() => {DeletePres(item.id)}}>Delete</button></li>
   );
   const listItems3 = Object.values(tick).map((item) =>
-    <li>id: {item.id} | conference: {item.conference} | price: {item.price} | state: {item.status}</li>
+    <li>id: {item.id} | conference: {item.conference} | price: {item.price} | state: {item.status}
+    <button classname="Deletebtn" onClick={() => {DeleteTicket(item.id)}}>Delete</button></li>
   );
         
-  console.log({id:props.user['id']});
+  //console.log({id:props.user['id']});
 
     useEffect(() => {
        console.log(Object.keys(props.user).length!==0);
