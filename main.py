@@ -227,25 +227,32 @@ def create_ticket(send_mail=False):
     else:
         ticket_id = ticket_id[0][0]
     ticket_id += 1
-    price = (data.send_request(f'''SELECT price FROM public."Conference" where id={conference} ''')[1][0][0]) * int(quantity)
+    price = (data.send_request(f'''SELECT price FROM public."Conference" where id={conference} ''')[1][0][0])
     if send_mail:
         result, database_data = data.send_request(f'''INSERT INTO public."User"(username) VALUES ('{email}') ''')
         if not result:
             ret = {"result": "Failure", "reason": database_data}
             return json.dumps(ret)
-        result = data.send_request(f'''INSERT INTO public."Ticket" (id, price, conference, status, owner) VALUES ('{ticket_id}','{price}','{conference}','{"Reserved"}','{email}')''', False)
-        if result and len(result) == 1:
-            ret = {"result": "Success"}
+        for i in range(int(quantity)):
+            result = data.send_request(
+                f'''INSERT INTO public."Ticket" (id, price, conference, status, owner) VALUES ('{ticket_id}','{price}','{conference}','{"Reserved"}','{email}')''',False)
+            if result and len(result) == 1:
+                ticket_id += 1
+                continue
+        ret = {"result": "Success"}
     else:
         result, database_data = data.send_request(f'''SELECT * FROM public."User" where username = '{username}' ''')
         if result:
             if len(database_data) > 0:
-                result = data.send_request(f'''INSERT INTO public."Ticket" (id, price, conference, status, owner) VALUES ('{ticket_id}','{price}','{conference}','{"Reserved"}','{username}')''', False)
-                if result and type(result) == bool:
-                    ret = {"result": "Success"}
-                    return json.dumps(ret)
-                else:
-                    ret = {"result": "Failure", "reason": result[1]}
+                for i in range(int(quantity)):
+                    result = data.send_request(
+                        f'''INSERT INTO public."Ticket" (id, price, conference, status, owner) VALUES ('{ticket_id}','{price}','{conference}','{"Reserved"}','{username}')''',False)
+                    if result and type(result) == bool:
+                        ticket_id += 1
+                        continue
+                    else:
+                        ret = {"result": "Failure", "reason": result[1]}
+                ret = {"result": "Success"}
             else:
                 ret = {"result": "Failure", "reason": "User not found"}
         else:
