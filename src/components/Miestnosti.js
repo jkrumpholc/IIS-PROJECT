@@ -2,7 +2,6 @@ import axios from "axios";
 import './Miestnosti.css';
 import React, { useState, useEffect } from 'react';
 import {CreateConference} from './CreateConference';
-import {RegisterPresentation} from './RegisterPresentation';
 import { Link } from 'react-router-dom';
 
 export const Miestnosti = (props) => {
@@ -47,7 +46,7 @@ export const Miestnosti = (props) => {
     <Link to="/clicked_konf"><li key={index} >{number}</li></Link>
     );*/
     const listItems = Object.values(Konf).map((item) =>
-        <Link to="/clicked_konf"><li onClick={() => {props.konfStateHandler(item)}}>Conference: {item.description} | Genre: {item.genre} | Organizer: {item.organizer} | Sold Tickets: {item.participants}/{item.capacity} <br></br> Date: {item.date}, {item.begin_time} - {item.end_time}, Address: {item.address} </li></Link>
+        <Link to="/clicked_konf"><li key={item.id} onClick={() => {props.konfStateHandler(item)}}>Conference: {item.description} | Genre: {item.genre} | Organizer: {item.organizer} | Sold Tickets: {item.participants}/{item.capacity} <br></br> Date: {item.date}, {item.begin_time} - {item.end_time}, Address: {item.address} </li></Link>
     );
 
     return (
